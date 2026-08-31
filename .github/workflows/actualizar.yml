@@ -1,0 +1,40 @@
+name: Actualizar normas
+
+on:
+  schedule:
+    - cron: "0 10 * * *"      # 06:00 en Chile continental
+  workflow_dispatch:           # botón para correrlo cuando quieras
+
+permissions:
+  contents: write
+
+jobs:
+  ingesta:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Descargar desde la BCN y convertir
+        run: python3 ingesta_bcn.py 176595 -o datos/cpp.json --js datos/cpp.js
+
+      - name: Validar antes de publicar
+        run: |
+          python3 - <<'PY'
+          import json
+          d = json.load(open("datos/cpp.json", encoding="utf-8"))
+          assert len(d["articulos"]) > 500, "faltan articulos: no se publica"
+          assert d["estructura"], "sin jerarquia: no se publica"
+          print(len(d["articulos"]), "articulos validados")
+          PY
+
+      - name: Publicar solo si cambio
+        run: |
+          git config user.name  "bot-normas"
+          git config user.email "bot@users.noreply.github.com"
+          git add datos/
+          git diff --staged --quiet && echo "sin cambios en la norma" && exit 0
+          git commit -m "Actualiza Ley 19.696 ($(date +%F))"
+          git push
