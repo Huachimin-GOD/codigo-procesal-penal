@@ -212,9 +212,22 @@ article.art:hover .art-tools,article.art:focus-within .art-tools{opacity:1}
   opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}
 .toast[data-open="true"]{opacity:1;transform:translate(-50%,0)}
 
+/* ---------- pie con el aviso legal ---------- */
+.aviso{margin-top:64px;padding-top:24px;border-top:2px solid var(--ink);
+  font-size:12.5px;line-height:1.6;color:var(--muted);max-width:72ch}
+.aviso h2{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink);margin:0 0 12px;font-weight:500}
+.aviso p{margin:0 0 12px;max-width:none}
+.aviso strong{color:var(--ink);font-weight:600}
+.aviso .datos{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0 14px}
+.aviso .datos span{font-family:var(--mono);font-size:11px;padding:3px 8px;border:1px solid var(--line);
+  border-radius:20px;background:var(--surface);font-variant-numeric:tabular-nums}
+.aviso .enlaces{display:flex;flex-wrap:wrap;gap:16px;font-size:12px;padding-top:12px;border-top:1px solid var(--line)}
+
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media print{
   .side,.bar,.rail,.art-tools,.scrim,.ovl,.toast{display:none!important}
+  .aviso{page-break-before:always}
   .app,.wrap{display:block;max-width:none;padding:0}
   body{background:#fff;color:#000}
   article.art{break-inside:avoid;content-visibility:visible}
@@ -273,6 +286,24 @@ article.art:hover .art-tools,article.art:focus-within .art-tools{opacity:1}
           <div class="meta" id="meta"></div>
         </div>
         <div id="body"></div>
+
+        <footer class="aviso">
+          <h2>Aviso legal y fuente</h2>
+          <p><strong>Este sitio no es oficial.</strong> Es una edición de consulta del Código Procesal
+          Penal preparada por un particular. Para todos los efectos legales rige exclusivamente el texto
+          publicado por la Biblioteca del Congreso Nacional de Chile en Ley Chile.</p>
+          <p>El articulado se genera automáticamente desde el XML oficial de la BCN. Aunque el proceso se
+          valida en cada actualización, pueden existir diferencias de transcripción o de formato respecto
+          del original. <strong>Verifica siempre contra la fuente oficial antes de citar en un escrito,
+          una audiencia o cualquier gestión con efectos jurídicos.</strong></p>
+          <p>Este sitio no presta asesoría legal ni reemplaza la opinión de un abogado.</p>
+          <div class="datos" id="avisoDatos"></div>
+          <div class="enlaces">
+            <a href="https://www.bcn.cl/leychile/navegar?idNorma=176595" target="_blank" rel="noopener">Texto oficial en Ley Chile</a>
+            <a href="https://github.com/Huachimin-GOD/codigo-procesal-penal" target="_blank" rel="noopener">Código fuente del sitio</a>
+            <a href="https://www.bcn.cl" target="_blank" rel="noopener">Biblioteca del Congreso Nacional</a>
+          </div>
+        </footer>
       </main>
 
       <aside class="rail">
@@ -360,6 +391,11 @@ $('#lastv').textContent = fecha(N.ultimaVersion);
 $('#barSub').textContent = 'Texto refundido al ' + fecha(N.ultimaVersion);
 $('#crestSub').textContent = N.ley.toUpperCase().replace(/\s/g,' ') + ' · CHILE';
 $('#openSearch').querySelector('span').textContent = 'Buscar en ' + N.articulos.length + ' artículos';
+$('#avisoDatos').innerHTML = [
+  N.ley, N.articulos.length + ' artículos',
+  'Versión del texto: ' + fecha(N.ultimaVersion),
+  'Generado el ' + fecha(new Date().toISOString().slice(0,10))
+].map(t => `<span>${esc(t)}</span>`).join('');
 
 /* ---------- índice lateral (árbol recursivo) ---------- */
 function rotulo(nodo){
