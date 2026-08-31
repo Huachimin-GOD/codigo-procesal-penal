@@ -1,0 +1,669 @@
+<title>Código Procesal Penal de Chile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{
+  --bg:#F7F8FA; --surface:#FFFFFF; --surface-2:#F0F2F6;
+  --ink:#12161D; --ink-2:#3C4553; --muted:#6B7484; --faint:#98A1B0;
+  --line:#E1E5EC; --line-strong:#CBD2DD;
+  --accent:#2E4A8C; --accent-ink:#FFFFFF; --accent-soft:#E9EEF9; --accent-line:#B9C7E6;
+  --mark:#FFE9A8; --mark-ink:#4A3A00;
+  --amber:#8A5A00; --amber-soft:#FBF0DC;
+  --red:#8C2F2F; --red-soft:#F7E9E9;
+  --shadow:0 1px 2px rgba(18,22,29,.05), 0 8px 24px -12px rgba(18,22,29,.18);
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --read:17px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1218; --surface:#151A22; --surface-2:#1C232D;
+    --ink:#E7EAF0; --ink-2:#C3CAD6; --muted:#939DAC; --faint:#6E7889;
+    --line:#252D39; --line-strong:#36404F;
+    --accent:#8DA8E8; --accent-ink:#0E1218; --accent-soft:#1A2334; --accent-line:#2E3C58;
+    --mark:#5C4A12; --mark-ink:#FFE9A8;
+    --amber:#D9A84A; --amber-soft:#2A2214;
+    --red:#E08585; --red-soft:#2C1A1A;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1218; --surface:#151A22; --surface-2:#1C232D;
+  --ink:#E7EAF0; --ink-2:#C3CAD6; --muted:#939DAC; --faint:#6E7889;
+  --line:#252D39; --line-strong:#36404F;
+  --accent:#8DA8E8; --accent-ink:#0E1218; --accent-soft:#1A2334; --accent-line:#2E3C58;
+  --mark:#5C4A12; --mark-ink:#FFE9A8;
+  --amber:#D9A84A; --amber-soft:#2A2214;
+  --red:#E08585; --red-soft:#2C1A1A;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+::selection{background:var(--accent-soft);color:var(--ink)}
+
+.app{display:grid;grid-template-columns:308px minmax(0,1fr);min-height:100vh}
+@media(max-width:1000px){.app{grid-template-columns:1fr}}
+
+/* ---------- barra ---------- */
+.bar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;
+  padding:10px 20px;background:color-mix(in srgb,var(--surface) 88%,transparent);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.bar-id{display:flex;flex-direction:column;line-height:1.2;min-width:0}
+.bar-id b{font-size:13.5px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-id span{font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-sp{flex:1}
+.searchbtn{display:flex;align-items:center;gap:10px;padding:7px 12px;min-width:240px;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:8px;color:var(--muted);font-size:13px}
+.searchbtn:hover{border-color:var(--line-strong)}
+.searchbtn kbd{margin-left:auto;font-family:var(--mono);font-size:11px;padding:1px 5px;border:1px solid var(--line-strong);border-radius:4px}
+@media(max-width:700px){.searchbtn{min-width:0}.searchbtn span,.searchbtn kbd{display:none}}
+.iconbtn{width:34px;height:34px;display:grid;place-items:center;border-radius:8px;border:1px solid transparent;color:var(--ink-2);flex:none}
+.iconbtn:hover{background:var(--surface-2);border-color:var(--line)}
+.menubtn{display:none}
+@media(max-width:1000px){.menubtn{display:grid}}
+
+/* ---------- índice lateral ---------- */
+.side{grid-row:1/3;border-right:1px solid var(--line);background:var(--surface);
+  display:flex;flex-direction:column;height:100vh;position:sticky;top:0;z-index:50}
+.side-head{padding:16px 18px 12px;border-bottom:1px solid var(--line)}
+.crest{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.crest svg{flex:none}
+.crest b{font-family:var(--serif);font-size:17px;font-weight:600;letter-spacing:-.015em;line-height:1.1;display:block}
+.crest small{display:block;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.03em;margin-top:3px}
+.filter{width:100%;padding:7px 10px;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:7px;color:var(--ink);font:inherit;font-size:13px}
+.filter::placeholder{color:var(--faint)}
+.side-scroll{flex:1;overflow-y:auto;padding:8px 8px 60px;overscroll-behavior:contain}
+
+.tw{display:block}
+.tw-btn{display:flex;width:100%;gap:7px;align-items:baseline;text-align:left;padding:5px 8px;border-radius:6px;line-height:1.35}
+.tw-btn:hover{background:var(--surface-2)}
+.tw-btn .car{flex:none;width:11px;color:var(--faint);font-size:9px;transition:transform .15s;display:inline-block}
+.tw-btn[aria-expanded="true"] .car{transform:rotate(90deg)}
+.tw-btn em{font-family:var(--mono);font-style:normal;font-size:11px;color:var(--faint);flex:none}
+.tw-l1>.tw-btn{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink);margin-top:8px}
+.tw-l2>.tw-btn{font-size:12.5px;font-weight:500;color:var(--ink-2)}
+.tw-l3>.tw-btn{font-size:12px;color:var(--muted)}
+.tw-kids{margin-left:10px;padding-left:9px;border-left:1px solid var(--line);display:none}
+.tw[data-open="true"]>.tw-kids{display:block}
+.artlist{display:flex;flex-wrap:wrap;gap:4px;padding:4px 8px 8px}
+.chip{font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:5px;
+  border:1px solid var(--line);color:var(--ink-2);background:var(--surface)}
+.chip:hover{border-color:var(--accent-line);color:var(--accent);background:var(--accent-soft)}
+.chip[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip.has-note{border-color:var(--amber)}
+@media(max-width:1000px){
+  .side{position:fixed;inset:0 auto 0 0;width:min(330px,88vw);transform:translateX(-102%);
+    transition:transform .22s ease;box-shadow:var(--shadow)}
+  .side[data-open="true"]{transform:none}
+  .scrim{position:fixed;inset:0;background:rgba(8,10,14,.45);z-index:45;opacity:0;pointer-events:none;transition:opacity .2s}
+  .scrim[data-open="true"]{opacity:1;pointer-events:auto}
+}
+@media(min-width:1001px){.scrim{display:none}}
+
+/* ---------- columna de lectura ---------- */
+.main{min-width:0}
+.wrap{max-width:1200px;margin:0 auto;padding:26px 24px 120px;
+  display:grid;grid-template-columns:minmax(0,1fr) 236px;gap:40px}
+@media(max-width:1240px){.wrap{grid-template-columns:minmax(0,1fr);max-width:780px}}
+
+.masthead{margin-bottom:30px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.masthead h1{font-family:var(--serif);font-size:clamp(30px,4.4vw,42px);font-weight:600;
+  letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;text-wrap:balance}
+.masthead .sub{color:var(--muted);font-size:13.5px;margin:0 0 14px}
+.meta{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-family:var(--mono);font-size:11px;padding:3px 8px;border:1px solid var(--line);
+  border-radius:20px;color:var(--muted);background:var(--surface);font-variant-numeric:tabular-nums}
+.tag.live{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
+
+.h-libro{margin:56px 0 26px;padding:16px 0 14px;border-top:2px solid var(--ink);border-bottom:1px solid var(--line)}
+.h-libro:first-child{margin-top:0}
+.h-libro em{display:block;font-family:var(--mono);font-style:normal;font-size:10.5px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+.h-libro h2{font-family:var(--serif);font-size:27px;font-weight:600;margin:0;letter-spacing:-.02em;text-wrap:balance}
+.h-titulo{margin:44px 0 20px}
+.h-titulo em{display:block;font-family:var(--mono);font-style:normal;font-size:10.5px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:4px}
+.h-titulo h3{font-family:var(--serif);font-size:21px;font-weight:600;margin:0;letter-spacing:-.015em;text-wrap:balance}
+.h-parrafo{margin:34px 0 14px;display:flex;align-items:baseline;gap:11px}
+.h-parrafo em{font-family:var(--mono);font-style:normal;font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--faint);white-space:nowrap}
+.h-parrafo h4{font-family:var(--sans);font-size:13.5px;font-weight:600;margin:0;color:var(--ink-2)}
+.h-parrafo::after{content:"";flex:1;height:1px;background:var(--line)}
+
+article.art{scroll-margin-top:78px;padding:18px 0 20px;border-bottom:1px solid var(--line);
+  content-visibility:auto;contain-intrinsic-size:auto 380px}
+article.art[data-hot="true"] .num{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.art-head{display:flex;align-items:baseline;gap:11px;margin-bottom:9px;flex-wrap:wrap}
+.num{font-family:var(--mono);font-size:12px;font-weight:500;padding:3px 8px;border-radius:6px;
+  border:1px solid var(--line-strong);color:var(--ink-2);white-space:nowrap;transition:background .3s,color .3s}
+.epi{font-family:var(--serif);font-size:19.5px;font-weight:600;letter-spacing:-.01em;margin:0;line-height:1.25;text-wrap:balance}
+.badge{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:20px;
+  background:var(--red-soft);color:var(--red);border:1px solid color-mix(in srgb,var(--red) 32%,transparent)}
+.art-body p{font-family:var(--serif);font-size:var(--read);line-height:1.68;color:var(--ink-2);
+  margin:0 0 .8em;max-width:68ch;text-align:justify;hyphens:auto}
+.art-body p:last-child{margin-bottom:0}
+.xref{color:var(--accent);text-decoration:underline;text-decoration-color:var(--accent-line);
+  text-underline-offset:2px;cursor:pointer}
+mark{background:var(--mark);color:var(--mark-ink);border-radius:2px;padding:0 1px}
+
+.art-tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;opacity:.4;transition:opacity .15s}
+article.art:hover .art-tools,article.art:focus-within .art-tools{opacity:1}
+@media(hover:none){.art-tools{opacity:1}}
+.tool{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:4px 9px;
+  border:1px solid var(--line);border-radius:6px;color:var(--muted);text-decoration:none}
+.tool:hover{border-color:var(--line-strong);color:var(--ink)}
+.tool[aria-pressed="true"]{background:var(--amber-soft);border-color:color-mix(in srgb,var(--amber) 40%,transparent);color:var(--amber)}
+
+.notebox{margin-top:12px;display:none}
+.notebox[data-open="true"]{display:block}
+.notebox textarea{width:100%;min-height:76px;resize:vertical;padding:10px 12px;font:inherit;font-size:13.5px;
+  background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;color:var(--ink);line-height:1.5}
+.notebox .hint{font-size:11px;color:var(--faint);margin-top:5px}
+
+/* ---------- riel derecho ---------- */
+.rail{position:sticky;top:78px;align-self:start;display:flex;flex-direction:column;gap:24px;
+  max-height:calc(100vh - 104px);overflow-y:auto;padding-bottom:20px}
+@media(max-width:1240px){.rail{position:static;max-height:none;border-top:1px solid var(--line);padding-top:28px;margin-top:40px}}
+.rail h3{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--faint);margin:0 0 10px;font-weight:500}
+.toc a{display:block;font-size:12px;padding:4px 0 4px 11px;border-left:2px solid var(--line);
+  color:var(--muted);text-decoration:none;line-height:1.35}
+.toc a:hover{color:var(--ink);border-color:var(--line-strong)}
+.toc a[aria-current="true"]{color:var(--accent);border-color:var(--accent);font-weight:500}
+.railcard{border:1px solid var(--line);border-radius:9px;padding:12px 13px;background:var(--surface);font-size:12px;color:var(--muted);line-height:1.5}
+.railcard b{color:var(--ink);display:block;margin-bottom:4px;font-size:12px}
+.mynotes{display:flex;flex-direction:column;gap:8px}
+.mynote{border-left:2px solid var(--amber);padding-left:10px;text-align:left;font-size:11.5px;color:var(--muted);line-height:1.4}
+.mynote b{display:block;font-family:var(--mono);font-size:11px;color:var(--ink)}
+.mynote:hover b{color:var(--accent)}
+
+/* ---------- buscador ---------- */
+.ovl{position:fixed;inset:0;z-index:60;display:none;padding:8vh 16px 16px;background:rgba(10,13,18,.5);backdrop-filter:blur(3px)}
+.ovl[data-open="true"]{display:block}
+.panel{max-width:680px;margin:0 auto;background:var(--surface);border:1px solid var(--line-strong);
+  border-radius:13px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;max-height:80vh}
+.panel-in{display:flex;align-items:center;gap:11px;padding:14px 17px;border-bottom:1px solid var(--line)}
+.panel-in input{flex:1;background:none;border:none;font:inherit;font-size:16px;color:var(--ink);min-width:0}
+.panel-in input:focus{outline:none}
+.panel-in input::placeholder{color:var(--faint)}
+.esc{font-family:var(--mono);font-size:10.5px;padding:2px 6px;border:1px solid var(--line-strong);border-radius:4px;color:var(--muted);flex:none}
+.results{overflow-y:auto;padding:6px}
+.res{display:block;width:100%;text-align:left;padding:9px 12px;border-radius:8px;border:1px solid transparent}
+.res[data-sel="true"]{background:var(--accent-soft);border-color:var(--accent-line)}
+.res-top{display:flex;gap:9px;align-items:baseline;margin-bottom:3px;flex-wrap:wrap}
+.res-top em{font-family:var(--mono);font-style:normal;font-size:11px;color:var(--accent);flex:none}
+.res-top b{font-size:13.5px;font-weight:600}
+.res-top i{font-style:normal;font-size:10.5px;color:var(--faint);font-family:var(--mono)}
+.res p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.45;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.res-empty{padding:26px 16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.6}
+.panel-foot{padding:8px 16px;border-top:1px solid var(--line);font-size:11px;color:var(--faint);
+  display:flex;gap:14px;font-family:var(--mono)}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);z-index:70;
+  background:var(--ink);color:var(--bg);font-size:12.5px;padding:8px 15px;border-radius:20px;
+  opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}
+.toast[data-open="true"]{opacity:1;transform:translate(-50%,0)}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media print{
+  .side,.bar,.rail,.art-tools,.scrim,.ovl,.toast{display:none!important}
+  .app,.wrap{display:block;max-width:none;padding:0}
+  body{background:#fff;color:#000}
+  article.art{break-inside:avoid;content-visibility:visible}
+}
+</style>
+
+<div class="app">
+  <aside class="side" id="side">
+    <div class="side-head">
+      <div class="crest">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3v18M6 21h12M3 8l4-3 4 3M3 8l2 4h4l2-4M13 8l4-3 4 3M13 8l2 4h4l2-4"/>
+        </svg>
+        <div>
+          <b>Código Procesal<br>Penal</b>
+          <small id="crestSub">LEY 19.696 · CHILE</small>
+        </div>
+      </div>
+      <input class="filter" id="filter" type="search" placeholder="Filtrar el índice…" aria-label="Filtrar el índice">
+    </div>
+    <nav class="side-scroll" id="tree" aria-label="Índice del código"></nav>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <div class="main">
+    <header class="bar">
+      <button class="iconbtn menubtn" id="menu" aria-label="Abrir el índice">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="bar-id">
+        <b id="barTitle">Código Procesal Penal</b>
+        <span id="barSub">Texto vigente</span>
+      </div>
+      <div class="bar-sp"></div>
+      <button class="searchbtn" id="openSearch">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <span>Buscar en 562 artículos</span>
+        <kbd>⌘K</kbd>
+      </button>
+      <button class="iconbtn" id="bigger" aria-label="Cambiar el tamaño del texto" title="Tamaño del texto">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19 9.5 5l5.5 14M6 14h7"/><path d="M17 12h5M19.5 9.5v5"/></svg>
+      </button>
+      <button class="iconbtn" id="theme" aria-label="Cambiar entre claro y oscuro" title="Tema">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      </button>
+      <button class="iconbtn" id="print" aria-label="Imprimir" title="Imprimir">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4v-6h16v6h-2M8 14h8v7H8z"/></svg>
+      </button>
+    </header>
+
+    <div class="wrap">
+      <main id="doc">
+        <div class="masthead">
+          <h1>Código Procesal Penal</h1>
+          <p class="sub" id="sub"></p>
+          <div class="meta" id="meta"></div>
+        </div>
+        <div id="body"></div>
+      </main>
+
+      <aside class="rail">
+        <div>
+          <h3 id="tocTitle">Contenido</h3>
+          <nav class="toc" id="toc"></nav>
+        </div>
+        <div>
+          <h3>Mis notas</h3>
+          <div class="mynotes" id="mynotes"></div>
+        </div>
+        <div class="railcard">
+          <b>Fuente</b>
+          Biblioteca del Congreso Nacional, <a href="https://www.bcn.cl/leychile/navegar?idNorma=176595" target="_blank" rel="noopener">Ley Chile</a>. Texto refundido al <span id="lastv"></span>. Consulta siempre la versión oficial antes de citar.
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<div class="ovl" id="ovl">
+  <div class="panel" role="dialog" aria-modal="true" aria-label="Buscar en el articulado">
+    <div class="panel-in">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="text" placeholder="Palabra, frase o número de artículo" autocomplete="off" spellcheck="false">
+      <span class="esc">esc</span>
+    </div>
+    <div class="results" id="results"></div>
+    <div class="panel-foot"><span>↑↓ moverse</span><span>↵ abrir</span><span id="count"></span></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="datos/cpp.js"></script>
+<script>
+const store = {
+  read(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  write(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+let notes = store.read('cpp.notes', {});
+
+const N = window.NORMA;
+const byNum = new Map(N.articulos.map(a => [a.n, a]));
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const slug = n => 'art-' + n.replace(/\s+/g,'-');
+const nid = (path) => 'n-' + path.join('-');
+const norm = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+
+/* ---------- tema, tamaño, impresión ---------- */
+const root = document.documentElement;
+const savedTheme = store.read('cpp.theme', null);
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+$('#theme').addEventListener('click', () => {
+  const dark = root.getAttribute('data-theme') === 'dark' ||
+    (!root.hasAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+  const next = dark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next); store.write('cpp.theme', next);
+});
+const sizes = ['16px','17px','18.5px','20px'];
+let sizeIdx = store.read('cpp.size', 1);
+const applySize = () => root.style.setProperty('--read', sizes[sizeIdx]);
+applySize();
+$('#bigger').addEventListener('click', () => {
+  sizeIdx = (sizeIdx + 1) % sizes.length; applySize(); store.write('cpp.size', sizeIdx);
+  toast('Texto en ' + sizes[sizeIdx]);
+});
+$('#print').addEventListener('click', () => window.print());
+
+/* ---------- cabecera ---------- */
+const fecha = f => { const [y,m,d] = (f||'').split('-'); return d ? `${d}-${m}-${y}` : (f||'—'); };
+const derogados = N.articulos.filter(a => a.d).length;
+const menores = new Set(['de','del','la','las','los','el','y','e','en','para']);
+const capital = t => t.toLowerCase().split(/\s+/).map((w,i) =>
+  (i && menores.has(w)) ? w : w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+$('#sub').textContent = capital(N.organismo || '') + ' · República de Chile · Texto oficial de Ley Chile (BCN)';
+$('#meta').innerHTML = [
+  ['live', N.ley], ['', N.articulos.length + ' artículos'],
+  ['', 'Publicada ' + fecha(N.publicacion)],
+  ['', 'Texto refundido al ' + fecha(N.ultimaVersion)],
+  ['', derogados + ' derogados']
+].map(([c,t]) => `<span class="tag ${c}">${esc(t)}</span>`).join('');
+$('#lastv').textContent = fecha(N.ultimaVersion);
+$('#barSub').textContent = 'Texto refundido al ' + fecha(N.ultimaVersion);
+$('#crestSub').textContent = N.ley.toUpperCase().replace(/\s/g,' ') + ' · CHILE';
+$('#openSearch').querySelector('span').textContent = 'Buscar en ' + N.articulos.length + ' artículos';
+
+/* ---------- índice lateral (árbol recursivo) ---------- */
+function rotulo(nodo){
+  const t = nodo.tipo || '';
+  return (nodo.num ? `${t} ${nodo.num}` : t).trim();
+}
+function coincide(nodo, f){
+  if (!f) return true;
+  if (norm(rotulo(nodo) + ' ' + nodo.nombre).includes(f)) return true;
+  if (nodo.arts?.some(n => { const a = byNum.get(n);
+    return a && norm('articulo ' + a.n + ' ' + a.epi).includes(f); })) return true;
+  return (nodo.hijos || []).some(h => coincide(h, f));
+}
+function ramaHTML(nodo, path, nivel, f){
+  const id = nid(path);
+  const abierto = openNodes.has(id) || (f && f.length > 1);
+  const arts = (nodo.arts || []).filter(n => {
+    if (!f) return true;
+    const a = byNum.get(n);
+    return a ? norm('articulo ' + a.n + ' ' + a.epi + ' ' + a.p.join(' ')).includes(f)
+             : false;
+  });
+  const hijos = (nodo.hijos || []).filter(h => coincide(h, f));
+  if (f && !arts.length && !hijos.length && !norm(rotulo(nodo)+' '+nodo.nombre).includes(f)) return '';
+  const tieneHijos = hijos.length || (nodo.arts || []).length;
+  return `<div class="tw tw-l${nivel}" data-open="${abierto}">
+    <button class="tw-btn" data-node="${esc(id)}" aria-expanded="${abierto}">
+      ${tieneHijos ? '<span class="car">▶</span>' : '<span class="car"></span>'}
+      ${nodo.num ? `<em>${esc(rotulo(nodo))}</em>` : ''}
+      <span>${esc(nodo.nombre || '')}</span>
+    </button>
+    <div class="tw-kids">
+      ${hijos.map((h,i) => ramaHTML(h, path.concat(i), Math.min(nivel+1,3), f)).join('')}
+      ${arts.length ? `<div class="artlist">` + arts.map(n =>
+        `<button class="chip${notes[n] ? ' has-note':''}" data-goto="${esc(slug(n))}" data-art="${esc(n)}">${esc(n)}</button>`
+      ).join('') + `</div>` : ''}
+    </div>
+  </div>`;
+}
+let openNodes = new Set(store.read('cpp.open', ['n-0']));
+function renderTree(filtro){
+  const f = norm((filtro || '').trim());
+  const html = N.estructura.map((nodo,i) => ramaHTML(nodo, [i], 1, f)).join('');
+  $('#tree').innerHTML = html || `<div class="res-empty">Sin coincidencias en el índice.</div>`;
+}
+$('#tree').addEventListener('click', e => {
+  const b = e.target.closest('.tw-btn'); if (!b) return;
+  const box = b.parentElement;
+  const abierto = box.dataset.open !== 'true';
+  box.dataset.open = abierto; b.setAttribute('aria-expanded', abierto);
+  abierto ? openNodes.add(b.dataset.node) : openNodes.delete(b.dataset.node);
+  store.write('cpp.open', [...openNodes]);
+});
+
+/* ---------- documento ---------- */
+function linkRefs(text){
+  return esc(text).replace(/\bart[íi]culos?\s+(\d+(?:\s+(?:bis|ter|qu[aá]ter|quinquies))?(?:\s+[A-Z]\b)?)/gi,
+    (m, n) => {
+      const key = n.trim().replace(/\s+/g, ' ');
+      return byNum.has(key)
+        ? m.slice(0, m.length - n.length) + `<span class="xref" data-goto="${slug(key)}">${n}</span>`
+        : m;
+    });
+}
+function artHTML(n){
+  const a = byNum.get(n); if (!a) return '';
+  return `<article class="art" id="${slug(n)}" data-art="${esc(n)}">
+    <div class="art-head">
+      <span class="num">Art. ${esc(a.n)}</span>
+      <h3 class="epi">${esc(a.epi || 'Sin epígrafe')}</h3>
+      ${a.d ? '<span class="badge">Derogado</span>' : ''}
+    </div>
+    <div class="art-body">${a.p.map(t => `<p>${linkRefs(t)}</p>`).join('')}</div>
+    <div class="art-tools">
+      <button class="tool" data-copy="${esc(n)}">Copiar cita</button>
+      <button class="tool" data-link="${esc(n)}">Enlace</button>
+      <button class="tool" data-note="${esc(n)}" aria-pressed="${!!notes[n]}">${notes[n] ? 'Nota guardada' : 'Añadir nota'}</button>
+      <a class="tool" href="${esc(N.fuente)}" target="_blank" rel="noopener">Ver en Ley Chile</a>
+    </div>
+    <div class="notebox" id="nb-${slug(n)}" data-open="false">
+      <textarea placeholder="Tu nota sobre el artículo ${esc(a.n)}…" data-noteinput="${esc(n)}">${esc(notes[n] || '')}</textarea>
+      <div class="hint">Se guarda en este navegador mientras escribes.</div>
+    </div>
+  </article>`;
+}
+const anclas = [];
+function seccionHTML(nodo, path, nivel){
+  const id = nid(path);
+  let html = '';
+  if (nivel === 1){
+    html += `<section class="h-libro" id="${id}"><em>${esc(rotulo(nodo))}</em><h2>${esc(nodo.nombre)}</h2></section>`;
+  } else if (nivel === 2){
+    html += `<section class="h-titulo" id="${id}"><em>${esc(rotulo(nodo))}</em><h3>${esc(nodo.nombre)}</h3></section>`;
+  } else {
+    html += `<section class="h-parrafo" id="${id}"><em>${esc(rotulo(nodo))}</em><h4>${esc(nodo.nombre)}</h4></section>`;
+  }
+  anclas.push({ id, nivel, rotulo: rotulo(nodo), nombre: nodo.nombre, libro: path[0] });
+  html += (nodo.hijos || []).map((h,i) => seccionHTML(h, path.concat(i), Math.min(nivel+1,3))).join('');
+  html += (nodo.arts || []).map(artHTML).join('');
+  return html;
+}
+function renderDoc(){
+  anclas.length = 0;
+  $('#body').innerHTML = N.estructura.map((n,i) => seccionHTML(n, [i], 1)).join('');
+  renderMyNotes();
+}
+function renderToc(libroIdx){
+  const items = anclas.filter(a => a.libro === libroIdx && a.nivel === 2);
+  const libro = anclas.find(a => a.libro === libroIdx && a.nivel === 1);
+  $('#tocTitle').textContent = libro ? libro.rotulo : 'Contenido';
+  $('#toc').innerHTML = items.map(a =>
+    `<a href="#${a.id}" data-toc="${a.id}">${esc(a.rotulo)}. ${esc(a.nombre)}</a>`).join('');
+}
+function renderMyNotes(){
+  const keys = Object.keys(notes).filter(k => (notes[k] || '').trim());
+  $('#mynotes').innerHTML = keys.length
+    ? keys.sort((a,b) => (byNum.get(a)?.ord || 0) - (byNum.get(b)?.ord || 0)).map(k =>
+        `<button class="mynote" data-goto="${esc(slug(k))}"><b>Art. ${esc(k)}</b>${esc(notes[k].slice(0,80))}</button>`).join('')
+    : `<div style="font-size:12px;color:var(--faint);line-height:1.5">Sin notas todavía. Usa <em>Añadir nota</em> en cualquier artículo.</div>`;
+}
+
+/* ---------- navegación ---------- */
+function goto(id, push){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'start'});
+  if (el.classList.contains('art')){
+    document.querySelectorAll('.art[data-hot="true"]').forEach(x => x.removeAttribute('data-hot'));
+    el.setAttribute('data-hot','true');
+    document.querySelectorAll('.chip[aria-current="true"]').forEach(x => x.removeAttribute('aria-current'));
+    document.querySelector(`.chip[data-goto="${id}"]`)?.setAttribute('aria-current','true');
+  }
+  if (push !== false) history.replaceState(null, '', '#' + id);
+  closeSide();
+}
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-goto]');
+  if (g){ goto(g.dataset.goto); return; }
+  const c = e.target.closest('[data-copy]');
+  if (c){ const a = byNum.get(c.dataset.copy);
+    const txt = `Artículo ${a.n} del Código Procesal Penal (${N.ley})${a.epi ? ' — ' + a.epi : ''}.\n\n${a.p.join('\n\n')}\n\nFuente: BCN, Ley Chile. Texto refundido al ${fecha(N.ultimaVersion)}.`;
+    navigator.clipboard?.writeText(txt).then(() => toast('Cita copiada'), () => toast('No se pudo copiar')); return; }
+  const l = e.target.closest('[data-link]');
+  if (l){ const url = location.href.split('#')[0] + '#' + slug(l.dataset.link);
+    navigator.clipboard?.writeText(url).then(() => toast('Enlace copiado'), () => toast('No se pudo copiar')); return; }
+  const nb = e.target.closest('[data-note]');
+  if (nb){ const box = document.getElementById('nb-' + slug(nb.dataset.note));
+    const open = box.dataset.open !== 'true'; box.dataset.open = open;
+    if (open) box.querySelector('textarea').focus(); return; }
+});
+document.addEventListener('input', e => {
+  const t = e.target.closest('[data-noteinput]'); if (!t) return;
+  const n = t.dataset.noteinput;
+  if (t.value.trim()) notes[n] = t.value; else delete notes[n];
+  store.write('cpp.notes', notes);
+  const btn = document.querySelector(`[data-note="${n}"]`);
+  if (btn){ btn.setAttribute('aria-pressed', !!notes[n]); btn.textContent = notes[n] ? 'Nota guardada' : 'Añadir nota'; }
+  document.querySelector(`.chip[data-art="${n}"]`)?.classList.toggle('has-note', !!notes[n]);
+  renderMyNotes();
+});
+
+let tFilter;
+$('#filter').addEventListener('input', e => {
+  clearTimeout(tFilter);
+  const v = e.target.value;
+  tFilter = setTimeout(() => renderTree(v), 140);
+});
+const openSide = () => { $('#side').dataset.open = 'true'; $('#scrim').dataset.open = 'true'; };
+const closeSide = () => { $('#side').dataset.open = 'false'; $('#scrim').dataset.open = 'false'; };
+$('#menu').addEventListener('click', openSide);
+$('#scrim').addEventListener('click', closeSide);
+
+/* ---------- buscador ---------- */
+const idx = N.articulos.map(a => ({
+  a, num: norm(a.n), epi: norm(a.epi || ''), txt: norm(a.p.join(' '))
+}));
+const ovl = $('#ovl'), qEl = $('#q');
+let hits = [], sel = 0;
+const openSearch = () => { ovl.dataset.open = 'true'; qEl.focus(); qEl.select(); };
+const closeSearch = () => { ovl.dataset.open = 'false'; };
+$('#openSearch').addEventListener('click', openSearch);
+ovl.addEventListener('click', e => { if (e.target === ovl) closeSearch(); });
+
+function search(raw){
+  const q = norm(raw.trim());
+  if (!q) return [];
+  const frase = q.length > 3;
+  const terms = q.split(/\s+/).filter(Boolean);
+  const out = [];
+  for (const e of idx){
+    // el número completo del artículo puede llevar espacios: “226 A”, “20 bis”
+    const numHit = e.num === q ? 1000 : e.num.startsWith(q) ? 300 : 0;
+    let score = numHit, ok = true;
+    if (frase && (e.epi.includes(q) || e.txt.includes(q))) score += e.epi.includes(q) ? 60 : 25;
+    for (const t of terms){
+      const inNum = e.num === t, numPref = e.num.startsWith(t);
+      const inEpi = e.epi.includes(t), inTxt = e.txt.includes(t);
+      if (!inNum && !numPref && !inEpi && !inTxt){ ok = false; break; }
+      score += inNum ? 400 : numPref ? 90 : 0;
+      score += inEpi ? 22 : 0;
+      score += inTxt ? 5 : 0;
+    }
+    if (!ok && !numHit) continue;
+    let snip = e.a.p.join(' ');
+    const at = norm(snip).indexOf(frase ? q : terms[0]);
+    if (at > 70) snip = '…' + snip.slice(at - 70);
+    out.push({ a: e.a, score, snip: snip.slice(0, 210) });
+  }
+  return out.sort((x,y) => y.score - x.score || x.a.ord - y.a.ord).slice(0, 60);
+}
+function hilite(text, raw){
+  const terms = norm(raw.trim()).split(/\s+/).filter(t => t.length > 1);
+  let html = esc(text);
+  for (const t of terms){
+    const src = norm(html); let res = '', i = 0;
+    while (true){
+      const at = src.indexOf(t, i);
+      if (at < 0 || html.slice(i, at).includes('<')){ res += html.slice(i); break; }
+      res += html.slice(i, at) + '<mark>' + html.slice(at, at + t.length) + '</mark>';
+      i = at + t.length;
+    }
+    html = res;
+  }
+  return html;
+}
+function ubicacion(n){
+  const el = document.getElementById(slug(n));
+  let s = el?.previousElementSibling, libro = '', tit = '';
+  let node = el;
+  while (node && (!libro || !tit)){
+    node = node.previousElementSibling;
+    if (!node) break;
+    if (!tit && node.classList.contains('h-titulo')) tit = node.querySelector('em').textContent;
+    if (!libro && node.classList.contains('h-libro')) libro = node.querySelector('em').textContent;
+  }
+  return [libro, tit].filter(Boolean).join(' · ');
+}
+function renderResults(raw){
+  hits = search(raw); sel = 0;
+  $('#count').textContent = raw.trim() ? hits.length + (hits.length === 60 ? '+ resultados' : (hits.length === 1 ? ' resultado' : ' resultados')) : '';
+  if (!raw.trim()){
+    $('#results').innerHTML = `<div class="res-empty">Busca por texto (“prisión preventiva”), por epígrafe o por número (“226 A”).<br>Se buscan los ${N.articulos.length} artículos completos.</div>`;
+    return;
+  }
+  if (!hits.length){ $('#results').innerHTML = `<div class="res-empty">Nada coincide con “${esc(raw)}”.</div>`; return; }
+  $('#results').innerHTML = hits.map((h, i) =>
+    `<button class="res" data-i="${i}" data-sel="${i===0}">
+      <div class="res-top"><em>Art. ${esc(h.a.n)}</em><b>${hilite(h.a.epi || 'Sin epígrafe', raw)}</b><i>${esc(ubicacion(h.a.n))}</i></div>
+      <p>${hilite(h.snip, raw)}</p></button>`).join('');
+}
+let tSearch;
+qEl.addEventListener('input', e => {
+  clearTimeout(tSearch); const v = e.target.value;
+  tSearch = setTimeout(() => renderResults(v), 90);
+});
+$('#results').addEventListener('click', e => {
+  const r = e.target.closest('.res'); if (!r) return;
+  closeSearch(); goto(slug(hits[+r.dataset.i].a.n));
+});
+function move(d){
+  if (!hits.length) return;
+  sel = (sel + d + hits.length) % hits.length;
+  document.querySelectorAll('.res').forEach((el, i) => el.dataset.sel = (i === sel));
+  document.querySelector(`.res[data-i="${sel}"]`)?.scrollIntoView({block:'nearest'});
+}
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k'){ e.preventDefault(); openSearch(); return; }
+  if (e.key === '/' && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)){ e.preventDefault(); openSearch(); return; }
+  if (ovl.dataset.open !== 'true') return;
+  if (e.key === 'Escape') closeSearch();
+  else if (e.key === 'ArrowDown'){ e.preventDefault(); move(1); }
+  else if (e.key === 'ArrowUp'){ e.preventDefault(); move(-1); }
+  else if (e.key === 'Enter' && hits[sel]){ closeSearch(); goto(slug(hits[sel].a.n)); }
+});
+
+/* ---------- seguimiento del scroll ---------- */
+let libroActual = -1;
+function spy(){
+  let libro = null, titulo = null;
+  for (const sec of document.querySelectorAll('.h-libro,.h-titulo')){
+    if (sec.getBoundingClientRect().top > 130) break;
+    if (sec.classList.contains('h-libro')){ libro = sec; titulo = null; }
+    else titulo = sec;
+  }
+  if (libro){
+    const i = anclas.find(a => a.id === libro.id)?.libro ?? -1;
+    if (i !== libroActual){ libroActual = i; renderToc(i); }
+    $('#barTitle').textContent = libro.querySelector('em').textContent + ' — ' + libro.querySelector('h2').textContent;
+  }
+  document.querySelectorAll('.toc a').forEach(a =>
+    a.setAttribute('aria-current', !!titulo && a.dataset.toc === titulo.id));
+}
+let raf = false;
+addEventListener('scroll', () => {
+  if (raf) return; raf = true;
+  requestAnimationFrame(() => { raf = false; spy(); });
+}, {passive:true});
+
+let tTimer;
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.dataset.open = 'true';
+  clearTimeout(tTimer); tTimer = setTimeout(() => t.dataset.open = 'false', 1800);
+}
+
+renderTree(''); renderDoc(); renderToc(0); renderResults(''); spy();
+if (location.hash) setTimeout(() => goto(location.hash.slice(1), false), 80);
+</script>
