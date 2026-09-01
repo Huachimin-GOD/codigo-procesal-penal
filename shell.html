@@ -718,9 +718,24 @@ function seccionHTML(nodo, path, nivel){
     html += `<section class="h-parrafo" id="${id}"><em>${esc(rotulo(nodo))}</em><h4>${esc(nodo.nombre)}</h4></section>`;
   }
   anclas.push({ id, nivel, rotulo: rotulo(nodo), nombre: nodo.nombre, libro: path[0] });
-  html += (nodo.hijos || []).map((h,i) => seccionHTML(h, path.concat(i), Math.min(nivel+1,3))).join('');
-  html += (nodo.arts || []).map(artHTML).join('');
+  // Una sección puede tener artículos propios y subsecciones a la vez, y el
+  // orden entre ellos cambia según el código: en el Penal los artículos 25 y 26
+  // van antes de su subpárrafo; en el Código del Trabajo, el Capítulo III los
+  // tiene después. Por eso no se dibuja «primero las subsecciones» ni «primero
+  // los artículos», sino en el orden en que están en la ley.
+  const piezas = [];
+  (nodo.hijos || []).forEach((h, i) => piezas.push({ orden: primerOrden(h), dibujar: () => seccionHTML(h, path.concat(i), Math.min(nivel + 1, 3)) }));
+  (nodo.arts || []).forEach(n => piezas.push({ orden: byNum.get(n)?.ord ?? Infinity, dibujar: () => artHTML(n) }));
+  piezas.sort((a, b) => a.orden - b.orden);
+  html += piezas.map(p => p.dibujar()).join('');
   return html;
+}
+/** El primer artículo de una sección, mirando también dentro de sus subsecciones. */
+function primerOrden(nodo){
+  let menor = Infinity;
+  for (const n of (nodo.arts || [])) menor = Math.min(menor, byNum.get(n)?.ord ?? Infinity);
+  for (const h of (nodo.hijos || [])) menor = Math.min(menor, primerOrden(h));
+  return menor;
 }
 function renderDoc(){
   anclas.length = 0;
