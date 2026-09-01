@@ -1,5 +1,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Los 562 artículos del Código Procesal Penal de Chile (Ley 19.696), con buscador instantáneo, generados desde el XML oficial de Ley Chile. Sitio no oficial.">
+<meta name="theme-color" content="#FAF8F4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16130F" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://huachimin-god.github.io/codigo-procesal-penal/">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="iconos/icono-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="iconos/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="CPP Chile">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_CL">
+<meta property="og:site_name" content="Código Procesal Penal de Chile">
+<meta property="og:title" content="Código Procesal Penal de Chile">
+<meta property="og:description" content="562 artículos con buscador instantáneo, desde el XML oficial de la Biblioteca del Congreso Nacional. Sitio no oficial.">
+<meta property="og:url" content="https://huachimin-god.github.io/codigo-procesal-penal/">
+<meta property="og:image" content="https://huachimin-god.github.io/codigo-procesal-penal/iconos/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Código Procesal Penal de Chile — 562 artículos, texto refundido al 22-07-2026">
+<meta name="twitter:card" content="summary_large_image">
 <title>Código Procesal Penal de Chile</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -872,6 +891,11 @@ let tTimer;
 function toast(msg){
   const t = $('#toast'); t.textContent = msg; t.dataset.open = 'true';
   clearTimeout(tTimer); tTimer = setTimeout(() => t.dataset.open = 'false', 1800);
+}
+
+/* Uso sin conexión. Solo tiene sentido servido por https, no con doble clic. */
+if ('serviceWorker' in navigator && location.protocol === 'https:'){
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 
 vistaMovil(store.read('cpp.vista', '') === 'movil');
