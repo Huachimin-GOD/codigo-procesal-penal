@@ -184,12 +184,98 @@ ing.recorrer(nodos, arts, [])
 comprobar("Un solo texto: el artículo del decreto que lo fija no se cuela",
           [a["n"] for a in arts] == ["1"], str([a["n"] for a in arts]))
 
-# --------------------------------------------------- 6. la fecha centinela
+# --------------------------------------------------- 8. la fecha centinela
 comprobar("Fecha: 2222-02-02 se rechaza", not ing.fecha_plausible("2222-02-02"))
 comprobar("Fecha: una real se acepta", ing.fecha_plausible("2025-08-28"))
 comprobar("Fecha: vacía se rechaza", not ing.fecha_plausible(""))
 comprobar("Fecha: basura se rechaza", not ing.fecha_plausible("sin fecha"))
 comprobar("Fecha: 1874 (Código Penal) se acepta", ing.fecha_plausible("1874-11-12"))
+
+# --------------------------------------------------- 6. la numeración
+# Todos los encabezados de aquí abajo están copiados del XML de la BCN, no
+# inventados. Cada uno rompía la numeración de una manera distinta.
+CASOS = [
+    # (encabezado tal como lo publica la BCN, número esperado, de qué código)
+    ("Artículo 1º.- Juicio previo.",              "1",        "Procesal Penal"),
+    ("Artículo 226 A.- Autorización judicial.",   "226 A",    "Procesal Penal"),
+    ("Art. 2º. En lo no previsto.",               "2",        "Civil"),
+    ("ART. 3. Los delitos, atendida su gravedad", "3",        "Penal"),
+    ("ART. 32. BIS La imposición del presidio",   "32 bis",   "Penal"),
+    ("ART. 297. BIS Cuando las amenazas",         "297 bis",  "Penal"),
+    ("ART. 161 - A. Se castigará con la pena",    "161 A",    "Penal"),
+    ("ART. 161-B. Se castigará con la pena",      "161 B",    "Penal"),
+    ("Artículo 313° a. El que, careciendo",       "313 a",    "Penal"),
+    ("ART. 319 a). Derogado.",                    "319 a",    "Penal"),
+    ("Artículo 4° bis.- Las obligaciones",        "4 bis",    "Tributario"),
+    ("Artículo 4º ter.- Los hechos imponibles",   "4 ter",    "Tributario"),
+    ("Art. 1o Las disposiciones de este Código",  "1",        "del Trabajo"),
+]
+
+for encabezado, esperado, codigo in CASOS:
+    num, epi, cuerpo = ing.partir_articulo([encabezado])
+    comprobar(f"{codigo}: «{encabezado[:34]}…» → {esperado}",
+              num == esperado, f"dio «{num}»")
+
+# La «o» de «Art. 1o» es marca de ordinal, no la primera letra del texto.
+num, epi, cuerpo = ing.partir_articulo(["Art. 1o Las disposiciones de este Código no alteran."])
+comprobar("del Trabajo: la «o» del ordinal no se cuela en el texto",
+          cuerpo and cuerpo[0].startswith("Las disposiciones"), str(cuerpo))
+
+# El 32 y el 32 bis son artículos distintos y no deben chocar.
+comprobar("Penal: el 32 y el 32 bis no colisionan",
+          ing.partir_articulo(["ART. 32. La pena de presidio sujeta al condenado."])[0] == "32"
+          and ing.partir_articulo(["ART. 32. BIS La imposición del presidio."])[0] == "32 bis")
+
+# Y el 32 bis se ordena justo después del 32, no en cualquier parte.
+comprobar("Penal: el 32 bis va después del 32 y antes del 33",
+          ing.orden("32") < ing.orden("32 bis") < ing.orden("33"),
+          f"{ing.orden('32')} < {ing.orden('32 bis')} < {ing.orden('33')}")
+comprobar("Penal: el 161 A va después del 161 y antes del 161 B",
+          ing.orden("161") < ing.orden("161 A") < ing.orden("161 B"),
+          f"{ing.orden('161')} < {ing.orden('161 A')} < {ing.orden('161 B')}")
+
+# --------------------------------------------------- 7. los transitorios
+# El articulado transitorio vuelve a numerar desde 1. La BCN lo marca con un
+# atributo propio; sin usarlo, el Tributario tendría dos artículos «1».
+def ef_trans(tipo, texto, transitorio):
+    marca = "transitorio" if transitorio else "no transitorio"
+    return (f'<EstructuraFuncional tipoParte="{tipo}" fechaVersion="2020-01-01" '
+            f'derogado="no derogado" transitorio="{marca}">'
+            f'<Metadatos><TituloParte presente="no">\u00a0</TituloParte></Metadatos>'
+            f"<Texto>{texto}</Texto></EstructuraFuncional>")
+
+
+xml = (f'<Norma xmlns="{NS}" fechaVersion="2025-01-01"><EstructurasFuncionales>'
+       + ef_trans("Artículo", "Artículo 1.- Las disposiciones de este Código.", False)
+       + ef_trans("Artículo", "Artículo 2.- En lo no previsto.", False)
+       + ef_trans("Artículo", "Artículo 1°.- Las normas contenidas en el inciso 2°.", True)
+       + ef_trans("Artículo", "Artículo 2°.- Los términos que hubieren empezado a correr.", True)
+       + "</EstructurasFuncionales></Norma>")
+raiz = ET.fromstring(xml)
+arts = []
+cont = raiz.find(ing.Q("EstructurasFuncionales"))
+ing.recorrer(list(cont.findall(ing.Q("EstructuraFuncional"))), arts, [])
+nums = [a["n"] for a in arts]
+comprobar("Tributario: los transitorios no chocan con los permanentes",
+          nums == ["1", "2", "1 transitorio", "2 transitorio"], str(nums))
+comprobar("Tributario: ningún número se repite",
+          len(nums) == len(set(nums)), str(nums))
+comprobar("Tributario: el articulado transitorio va al final",
+          ing.orden("2") < ing.orden("1 transitorio"),
+          f"{ing.orden('2')} < {ing.orden('1 transitorio')}")
+comprobar("Tributario: el texto del transitorio queda intacto",
+          arts[2]["p"] and arts[2]["p"][0].startswith("Las normas contenidas"),
+          str(arts[2]["p"]))
+
+# El «Artículo transitorio» sin número del Procesal Penal no se duplica la palabra.
+xml2 = (f'<Norma xmlns="{NS}" fechaVersion="2025-01-01"><EstructurasFuncionales>'
+        + ef_trans("Artículo", "Artículo transitorio.- Reglas para la aplicación de las penas.", True)
+        + "</EstructurasFuncionales></Norma>")
+arts2 = []
+r2 = ET.fromstring(xml2).find(ing.Q("EstructurasFuncionales"))
+ing.recorrer(list(r2.findall(ing.Q("EstructuraFuncional"))), arts2, [])
+comprobar("Procesal Penal: «Artículo transitorio» no queda «transitorio transitorio»",
+          [a["n"] for a in arts2] == ["transitorio"], str([a["n"] for a in arts2]))
 
 print()
 # Salir con código 0 solo si todo pasó: así el robot de GitHub se detiene
