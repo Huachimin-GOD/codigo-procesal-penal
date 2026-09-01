@@ -182,7 +182,7 @@ LATIN = r"(?:bis|ter|qu[aá]ter|quinquies|sexies|septies|octies|nonies|decies)"
 # la oración, no un sufijo.
 NUMERO_ARTICULO = (
     r"\d+"                                     # el número
-    r"(?:[º°]|o(?=[\s.,\-–]))?"                 # marca de ordinal: 1º, 1°, 1o
+    r"(?:\.?(?:[º°]|o(?=[\s.,\-–])))?"           # ordinal: 1º, 1°, 1o, y también 1.o
     r"(?:\s*[.\-–]?\s*" + LATIN + r")?"        # primer sufijo latino
     r"(?-i:"                                    # las letras, respetando la caja
     r"(?:\s*[.\-–]?\s*[A-ZÑ]{1,2}"
@@ -218,7 +218,8 @@ def normaliza_num(n):
     en el mismo código, y ninguno de los dos se encontraría al buscar el otro.
     """
     n = n.replace("º", "").replace("°", "")
-    n = re.sub(r"^(\d+)o\b", r"\1", n)        # «1o» es «1º» escrito sin el símbolo
+    # «1o», «1.o» y «1 o» son «1º» escrito sin el símbolo, no un sufijo de letra.
+    n = re.sub(r"^(\d+)\s*\.?\s*o\b", r"\1", n)
     n = re.sub(r"[.\-–]", " ", n)               # el punto y el guion solo separan
     partes = [p for p in n.split() if p]
     # El sufijo latino siempre en minúscula; las letras se dejan como vienen.
