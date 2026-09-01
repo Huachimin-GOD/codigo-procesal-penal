@@ -2,7 +2,7 @@
 <html lang="es-CL">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" id="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Los 737 artículos del Código del Trabajo de Chile (Decreto con Fuerza de Ley 1), con buscador instantáneo, generados desde el XML oficial de Ley Chile. Sitio no oficial.">
 <meta name="theme-color" content="#FAF8F4" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16130F" media="(prefers-color-scheme: dark)">
@@ -120,9 +120,15 @@ a{color:var(--accent)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
 ::selection{background:var(--accent-soft);color:var(--ink)}
 
-.app{display:grid;grid-template-columns:308px minmax(0,1fr);min-height:100vh;
-  container-type:inline-size;container-name:app;transition:max-width .25s ease}
-@container app (max-width:1000px){.app{grid-template-columns:1fr}}
+/* El contenedor de consulta vive en el envoltorio, no en .app.
+   Un elemento no puede responder a su propia consulta de contenedor: mientras
+   .app fue su propio contenedor, la regla que colapsaba el índice en pantallas
+   angostas nunca llegó a aplicarse, y la columna de texto quedaba en 260 px
+   con el resto del ancho vacío. Con el envoltorio, .app sí es descendiente. */
+.encuadre{container-type:inline-size;container-name:app;
+  margin:0 auto;transition:max-width .25s ease}
+.app{display:grid;grid-template-columns:308px minmax(0,1fr);min-height:100vh}
+@container app (max-width:1000px){.app{grid-template-columns:minmax(0,1fr)}}
 
 /* ---------- barra ---------- */
 .bar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;
@@ -145,7 +151,7 @@ a{color:var(--accent)}
   .bar{gap:8px;padding:10px 14px}
 }
 /* dentro de un teléfono de verdad el botón de vista no tiene sentido */
-@container app (max-width:1000px){#movil{display:none}}
+/* el botón de vista sirve en los dos sentidos, también en el teléfono */
 .iconbtn{width:34px;height:34px;display:grid;place-items:center;border-radius:8px;border:1px solid transparent;color:var(--ink-2);flex:none}
 .iconbtn:hover{background:var(--surface-2);border-color:var(--line)}
 .menubtn{display:none}
@@ -322,10 +328,17 @@ mark{background:var(--mark);color:var(--mark-ink);border-radius:2px;padding:0 1p
 .aviso .enlaces{display:flex;flex-wrap:wrap;gap:16px;font-size:12px;padding-top:12px;border-top:1px solid var(--line)}
 
 /* ---------- vista de teléfono ---------- */
-:root[data-vista="movil"] .app{max-width:420px;margin:0 auto;
+:root[data-vista="movil"] .encuadre{max-width:420px;
   box-shadow:0 0 0 1px var(--line-strong), 0 24px 60px -20px var(--nu-bajo)}
+
+/* La vista de computador no se hace con CSS: se declara que la página mide
+   1180 px y el teléfono la reduce para que quepa, que es lo mismo que hace un
+   navegador al pedir «versión de escritorio». Ensanchar solo el envoltorio no
+   sirve: el teléfono agranda su propio lienzo y la barra para salir queda
+   fuera de la pantalla. */
 :root[data-vista="movil"] body{background:var(--surface-2)}
-:root[data-vista="movil"] .marco{display:flex}
+:root[data-vista="movil"] .marco,
+:root[data-vista="escritorio"] .marco{display:flex}
 :root[data-vista="movil"] .side{left:calc(50% - 210px);right:auto}
 :root[data-vista="movil"] .scrim{left:calc(50% - 210px);width:420px;right:auto}
 .marco{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:55;
@@ -428,6 +441,7 @@ article.art{border-bottom:1px solid var(--line)}
 </head>
 <body>
 <a class="salto" href="#doc">Saltar al articulado</a>
+<div class="encuadre" id="encuadre">
 <div class="app">
   <aside class="side" id="side">
     <div class="side-head">
@@ -533,9 +547,10 @@ article.art{border-bottom:1px solid var(--line)}
     <div class="panel-foot"><span>↑↓ moverse</span><span>↵ abrir</span><span id="count"></span></div>
   </div>
 </div>
+</div><!-- fin del envoltorio -->
 
 <div class="marco" id="marco">
-  <b>Vista de teléfono</b>
+  <b id="marcoTitulo">Vista de teléfono</b>
   <span>420 px de ancho</span>
   <button id="salirMovil">Salir</button>
 </div>
@@ -587,15 +602,37 @@ $('#print').addEventListener('click', () => window.print());
    ahora responde al ancho del contenedor y no al de la ventana, el sitio
    entra en su modo compacto real, con el índice como cajón lateral. */
 const btnMovil = $('#movil');
-function vistaMovil(activa){
-  if (activa) root.setAttribute('data-vista', 'movil');
+/* El mismo botón sirve en los dos sentidos: en una pantalla ancha muestra cómo
+   se ve en un teléfono; en un teléfono, cómo se ve en un computador. Lo que
+   ofrece depende de dónde se está mirando. */
+function anchoDePantalla(){ return window.screen ? window.screen.width : innerWidth; }
+const metaAncho = document.getElementById('viewport');
+const ANCHO_ESCRITORIO = 'width=1180';
+const ANCHO_NORMAL = 'width=device-width, initial-scale=1';
+function vista(cual){
+  if (cual) root.setAttribute('data-vista', cual);
   else root.removeAttribute('data-vista');
-  btnMovil.setAttribute('aria-pressed', activa);
-  store.write('cpp.vista', activa ? 'movil' : '');
+  metaAncho.setAttribute('content', cual === 'escritorio' ? ANCHO_ESCRITORIO : ANCHO_NORMAL);
+  btnMovil.setAttribute('aria-pressed', cual ? 'true' : 'false');
+  const enTelefono = anchoDePantalla() <= 1000;
+  const ofrece = cual ? 'Volver a la vista normal'
+                      : (enTelefono ? 'Ver como en un computador' : 'Ver como en un teléfono');
+  btnMovil.setAttribute('title', ofrece);
+  btnMovil.setAttribute('aria-label', ofrece);
+  const titulo = $('#marcoTitulo');
+  if (titulo) titulo.textContent = cual === 'escritorio' ? 'Vista de computador' : 'Vista de teléfono';
+  store.write('cpp.vista', cual || '');
   closeSide();
+  if (cual !== 'escritorio') window.scrollTo({left: 0});
 }
-btnMovil.addEventListener('click', () => vistaMovil(root.getAttribute('data-vista') !== 'movil'));
-$('#salirMovil').addEventListener('click', () => vistaMovil(false));
+function vistaMovil(activa){ vista(activa ? 'movil' : ''); }
+btnMovil.addEventListener('click', () => {
+  const ahora = root.getAttribute('data-vista');
+  if (ahora) return vista('');
+  vista(anchoDePantalla() <= 1000 ? 'escritorio' : 'movil');
+});
+$('#salirMovil').addEventListener('click', () => vista(''));
+addEventListener('resize', () => { if (!root.getAttribute('data-vista')) vista(''); });
 
 /* ---------- cabecera ---------- */
 const fecha = f => { const [y,m,d] = (f||'').split('-'); return d ? `${d}-${m}-${y}` : (f||'—'); };
@@ -979,7 +1016,14 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:'){
   addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 
-vistaMovil(store.read('cpp.vista', '') === 'movil');
+(() => {
+  // La vista de computador solo tiene sentido en una pantalla chica; si se
+  // guardó en el teléfono y luego se abre en un computador, se ignora.
+  const guardada = store.read('cpp.vista', '');
+  const vale = guardada === 'movil' ? anchoDePantalla() > 1000
+             : guardada === 'escritorio' ? anchoDePantalla() <= 1000 : false;
+  vista(vale ? guardada : '');
+})();
 renderTree(''); renderDoc(); renderToc(0); renderResults(''); spy();
 if (location.hash) setTimeout(() => goto(location.hash.slice(1), false), 80);
 </script>
