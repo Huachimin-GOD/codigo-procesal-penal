@@ -690,7 +690,7 @@ function artHTML(n){
   return `<article class="art" id="${slug(n)}" data-art="${esc(n)}">
     <div class="art-head">
       <span class="num">Art. ${esc(a.n)}</span>
-      <h3 class="epi">${esc(a.epi || 'Sin epígrafe')}</h3>
+      ${a.epi ? `<h3 class="epi">${esc(a.epi)}</h3>` : ''}
       ${a.d ? '<span class="badge">Derogado</span>' : ''}
     </div>
     <div class="art-body">${a.p.map(t => `<p>${linkRefs(t)}</p>`).join('')}</div>
@@ -910,7 +910,7 @@ function renderResults(raw){
   if (!hits.length){ $('#results').innerHTML = `<div class="res-empty">Nada coincide con “${esc(raw)}”.</div>`; return; }
   $('#results').innerHTML = hits.map((h, i) =>
     `<button class="res" data-i="${i}" data-sel="${i===0}">
-      <div class="res-top"><em>Art. ${esc(h.a.n)}</em><b>${hilite(h.a.epi || 'Sin epígrafe', raw)}</b><i>${esc(ubicacion(h.a.n))}</i></div>
+      <div class="res-top"><em>Art. ${esc(h.a.n)}</em><b>${h.a.epi ? hilite(h.a.epi, raw) : ''}</b><i>${esc(ubicacion(h.a.n))}</i></div>
       <p>${hilite(h.snip, raw)}</p></button>`).join('');
 }
 let tSearch;
