@@ -1,0 +1,103 @@
+name: Publicar codigos
+
+# Baja los codigos desde la BCN, arma sus paginas y las publica.
+# Se corre a mano: es el paso que agrega contenido nuevo al sitio.
+on:
+  workflow_dispatch:
+    inputs:
+      slugs:
+        description: "Que codigos publicar, separados por espacio (vacio = todos los del registro)"
+        required: false
+        default: "penal trabajo tributario"
+
+permissions:
+  contents: write
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Probar el parser antes de tocar nada
+        run: python3 prueba_jerarquia.py
+
+      - name: Bajar cada codigo desde la BCN
+        run: |
+          python3 - <<'PY'
+          import os, subprocess, sys, time, pathlib
+          from codigos import CODIGOS, POR_SLUG, SITIO, ruta_datos
+
+          pedidos = (os.environ.get("SLUGS") or "").split()
+          objetivo = [POR_SLUG[s] for s in pedidos] if pedidos else CODIGOS
+
+          # La BCN limita las peticiones seguidas: 20 segundos entre normas.
+          for i, c in enumerate(objetivo):
+              if i:
+                  time.sleep(20)
+              destino = SITIO / ruta_datos(c, "json")
+              destino.parent.mkdir(parents=True, exist_ok=True)
+              cmd = ["python3", "ingesta_bcn.py", str(c["id"]),
+                     "-o", str(destino),
+                     "--js", str(destino.with_suffix(".js"))]
+              if c["articulado"]:
+                  cmd += ["--articulado", c["articulado"]]
+              print("::group::" + c["nombre"], flush=True)
+              subprocess.run(cmd, check=True)
+              print("::endgroup::", flush=True)
+          PY
+        env:
+          SLUGS: ${{ github.event.inputs.slugs }}
+
+      - name: Armar las paginas
+        run: python3 construir.py
+
+      - name: Validar antes de publicar
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, sys
+          from codigos import CODIGOS, SITIO, ruta_datos
+
+          problemas = []
+          for c in CODIGOS:
+              ruta = SITIO / ruta_datos(c, "json")
+              if not ruta.exists():
+                  continue
+              d = json.loads(ruta.read_text(encoding="utf-8"))
+              arts = d["articulos"]
+              f = d["ultimaVersion"]
+              if len(arts) < 20:
+                  problemas.append(f"{c['slug']}: solo {len(arts)} articulos")
+              if not d["estructura"]:
+                  problemas.append(f"{c['slug']}: indice vacio")
+              if sum(1 for a in arts if not a["p"]):
+                  problemas.append(f"{c['slug']}: hay articulos sin texto")
+              if len(f) != 10 or not ("1800" <= f[:4] <= "2100"):
+                  problemas.append(f"{c['slug']}: fecha imposible {f}")
+              # numeros de articulo repetidos delatan dos cuerpos legales mezclados
+              nums = [a["n"] for a in arts]
+              if len(nums) != len(set(nums)):
+                  repes = sorted({n for n in nums if nums.count(n) > 1})[:5]
+                  problemas.append(f"{c['slug']}: articulos repetidos {repes}")
+              pagina = SITIO / c["carpeta"] / "index.html"
+              if not pagina.exists():
+                  problemas.append(f"{c['slug']}: no se genero la pagina")
+              print(f"  {c['slug']:12} {len(arts):>5} articulos  {f}  "
+                    f"{'deducida' if d.get('versionInferida') else ''}")
+
+          if problemas:
+              sys.exit("NO SE PUBLICA:\n  - " + "\n  - ".join(problemas))
+          print("todo validado")
+          PY
+
+      - name: Publicar solo si cambio
+        run: |
+          git config user.name  "bot-normas"
+          git config user.email "bot@users.noreply.github.com"
+          git add -A
+          git diff --staged --quiet && echo "sin cambios" && exit 0
+          git commit -m "Publica codigos ($(date +%F))"
+          git push
