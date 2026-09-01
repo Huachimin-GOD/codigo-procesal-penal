@@ -23,6 +23,8 @@ import argparse
 import json
 import re
 import sys
+import time
+import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 
@@ -39,13 +41,43 @@ ORDINALES = {
 
 # ---------------------------------------------------------------- descarga
 
-def descargar(id_norma, fecha=None):
+def descargar(id_norma, fecha=None, intentos=4, espera=30):
+    """Descarga el XML de una norma, con reintentos ante limitación de la BCN.
+
+    La BCN responde 429 (demasiadas peticiones) si se le piden varias normas
+    seguidas: medido en la práctica, la primera pasa y la siguiente ya se
+    rechaza. Por eso se espera y se reintenta con pausas crecientes, y se
+    respeta la cabecera Retry-After cuando viene.
+    """
     url = ENDPOINT.format(id=id_norma)
     if fecha:
         url += f"&fechaVersion={fecha}"
-    req = urllib.request.Request(url, headers={"User-Agent": "ingesta-leyes/1.1"})
-    with urllib.request.urlopen(req, timeout=120) as r:
-        return r.read()
+    # Un agente identificable y con contacto: si molestamos, que sepan a quién escribir.
+    req = urllib.request.Request(url, headers={
+        "User-Agent": "ingesta-leyes/2.0 (+https://github.com/Huachimin-GOD/codigo-procesal-penal)",
+        "Accept": "application/xml",
+    })
+
+    ultimo = None
+    for intento in range(1, intentos + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=120) as r:
+                return r.read()
+        except urllib.error.HTTPError as e:
+            ultimo = e
+            if e.code not in (429, 503) or intento == intentos:
+                raise
+            pausa = int(e.headers.get("Retry-After") or 0) or espera * intento
+            print(f"    la BCN respondió {e.code}; espero {pausa}s "
+                  f"(intento {intento} de {intentos})", file=sys.stderr, flush=True)
+            time.sleep(pausa)
+        except urllib.error.URLError as e:
+            ultimo = e
+            if intento == intentos:
+                raise
+            print(f"    error de red ({e.reason}); espero {espera}s", file=sys.stderr, flush=True)
+            time.sleep(espera)
+    raise ultimo
 
 
 # ---------------------------------------------------------------- utilidades
@@ -180,27 +212,6 @@ def recorrer(nodos, articulos, ruta):
     return ramas
 
 
-# ---------------------------------------------------------------- salida web
-
-def para_lector(d):
-    """Versión compacta que consume el lector: sin campos internos de la ingesta."""
-    def poda(rama):
-        return {"tipo": rama["tipo"], "num": rama["num"], "nombre": rama["nombre"],
-                "hijos": [poda(h) for h in rama["hijos"]], "arts": rama["arts"]}
-    return {
-        "idNorma": d["idNorma"], "titulo": d["titulo"], "ley": d["ley"],
-        "organismo": d["organismo"], "promulgacion": d["promulgacion"],
-        "publicacion": d["publicacion"], "ultimaVersion": d["ultimaVersion"],
-        "fuente": d["fuente"],
-        "estructura": [poda(r) for r in d["estructura"]],
-        "articulos": [
-            {"n": a["n"], "ord": a["ord"], "epi": a["epi"], "p": a["p"],
-             **({"d": 1} if a["derogado"] else {})}
-            for a in d["articulos"]
-        ],
-    }
-
-
 # ---------------------------------------------------------------- principal
 
 def main():
@@ -209,7 +220,6 @@ def main():
     ap.add_argument("-o", "--salida", default="norma.json")
     ap.add_argument("--fecha", help="fechaVersion AAAA-MM-DD")
     ap.add_argument("--xml", help="ruta a un XML ya descargado")
-    ap.add_argument("--js", help="además, escribe el archivo que carga el lector (window.NORMA=…)")
     args = ap.parse_args()
 
     crudo = open(args.xml, "rb").read() if args.xml else descargar(args.id_norma, args.fecha)
@@ -251,11 +261,6 @@ def main():
 
     with open(args.salida, "w", encoding="utf-8") as f:
         json.dump(salida, f, ensure_ascii=False, indent=1)
-
-    if args.js:
-        with open(args.js, "w", encoding="utf-8") as f:
-            f.write("window.NORMA=" + json.dumps(para_lector(salida), ensure_ascii=False,
-                                                 separators=(",", ":")) + ";\n")
 
     sin_epi = sum(1 for a in articulos if not a["epi"])
     print(f"{len(articulos)} artículos → {args.salida} "

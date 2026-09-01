@@ -4,7 +4,7 @@
 Sirve para ver cuáles parsean limpio antes de decidir qué se publica.
 Se ejecuta en GitHub Actions, que sí tiene acceso a la BCN.
 """
-import io, sys, traceback, contextlib
+import sys, time
 import ingesta_bcn as ing
 
 # Los quince códigos de la República, tal como los lista la BCN en
@@ -53,9 +53,16 @@ def analizar(id_norma):
     }
 
 
+# La BCN limita las peticiones seguidas. Con 20 segundos entre códigos la
+# prueba completa toma unos cinco minutos y no la molestamos.
+PAUSA = 20
+
+
 def main():
     filas, fallos = [], []
-    for nombre, id_norma in CODIGOS:
+    for i, (nombre, id_norma) in enumerate(CODIGOS):
+        if i:
+            time.sleep(PAUSA)
         try:
             r = analizar(id_norma)
             filas.append((nombre, id_norma, r))
