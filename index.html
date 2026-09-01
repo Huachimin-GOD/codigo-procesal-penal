@@ -20,7 +20,7 @@
 <meta property="og:image" content="https://australcode-1.github.io/codigo-procesal-penal/iconos/compartir.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Código Procesal Penal de Chile — 562 artículos, texto refundido al 22-07-2026">
+<meta property="og:image:alt" content="Código Procesal Penal de Chile — 562 artículos, texto refundido al 2026-07-22">
 <meta name="twitter:card" content="summary_large_image">
 <title>Código Procesal Penal de Chile</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -159,6 +159,17 @@ a{color:var(--accent)}
 .crest svg{flex:none}
 .crest b{font-family:var(--serif);font-size:17px;font-weight:600;letter-spacing:-.015em;line-height:1.1;display:block}
 .crest small{display:block;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.03em;margin-top:3px}
+/* Selector de códigos: se lee como una lista de pestañas discretas, no como
+   un menú. El código actual no es un enlace —no se va a donde ya se está— y se
+   marca con el color de acento, no solo con negrita, para que se distinga
+   también en pantallas donde el peso tipográfico se pierde. */
+.codigos{display:flex;flex-wrap:wrap;gap:2px 0;padding:8px 18px 10px;
+  border-bottom:1px solid var(--line);font-size:12.5px}
+.codigos a,.codigos .cod-actual{padding:4px 9px;border-radius:6px;line-height:1.3}
+.codigos a{color:var(--muted);text-decoration:none}
+.codigos a:hover{background:var(--surface-2);color:var(--ink)}
+.cod-actual{background:var(--accent-soft);color:var(--accent);font-weight:600}
+
 .filter{width:100%;padding:7px 10px;background:var(--surface-2);border:1px solid var(--line);
   border-radius:7px;color:var(--ink);font:inherit;font-size:13px}
 .filter::placeholder{color:var(--faint)}
@@ -336,7 +347,7 @@ mark{background:var(--mark);color:var(--mark-ink);border-radius:2px;padding:0 1p
 
 /* ================= relieve suave (neumorfismo aplicado con criterio) =================
    El relieve va en los CONTROLES. El texto de la ley se queda plano y con
-   contraste alto: 562 artículos no se leen sobre superficies de bajo contraste. */
+   contraste alto: cientos de artículos no se leen sobre superficies de bajo contraste. */
 :root{
   --nu-bg:#EBE6DE;            /* el fondo y las piezas comparten color: eso crea el relieve */
   --nu-alto:rgba(255,255,255,.92);
@@ -426,7 +437,7 @@ article.art{border-bottom:1px solid var(--line)}
         </svg>
         <div>
           <b>Código Procesal<br>Penal</b>
-          <small id="crestSub">LEY 19.696 · CHILE</small>
+          <small id="crestSub"></small>
         </div>
       </div>
       <input class="filter" id="filter" type="search" placeholder="Filtrar el índice…" aria-label="Filtrar el índice">
@@ -589,6 +600,8 @@ $('#salirMovil').addEventListener('click', () => vistaMovil(false));
 const fecha = f => { const [y,m,d] = (f||'').split('-'); return d ? `${d}-${m}-${y}` : (f||'—'); };
 const derogados = N.articulos.filter(a => a.d).length;
 const menores = new Set(['de','del','la','las','los','el','y','e','en','para']);
+// Nombre del código, puesto al construir la página.
+const NOMBRE_CODIGO = 'Código Procesal Penal';
 const capital = t => t.toLowerCase().split(/\s+/).map((w,i) =>
   (i && menores.has(w)) ? w : w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 // La BCN no siempre declara la fecha de la versión: en algunos códigos publica
@@ -772,7 +785,7 @@ document.addEventListener('click', e => {
   if (g){ goto(g.dataset.goto); return; }
   const c = e.target.closest('[data-copy]');
   if (c){ const a = byNum.get(c.dataset.copy);
-    const txt = `Artículo ${a.n} del Código Procesal Penal (${N.ley})${a.epi ? ' — ' + a.epi : ''}.\n\n${a.p.join('\n\n')}\n\nFuente: BCN, Ley Chile. ${ETIQ_VERSION}${fecha(N.ultimaVersion)}.`;
+    const txt = `Artículo ${a.n} del ${NOMBRE_CODIGO} (${N.ley})${a.epi ? ' — ' + a.epi : ''}.\n\n${a.p.join('\n\n')}\n\nFuente: BCN, Ley Chile. ${ETIQ_VERSION}${fecha(N.ultimaVersion)}.`;
     navigator.clipboard?.writeText(txt).then(() => toast('Cita copiada'), () => toast('No se pudo copiar')); return; }
   const l = e.target.closest('[data-link]');
   if (l){ const url = location.href.split('#')[0] + '#' + slug(l.dataset.link);
