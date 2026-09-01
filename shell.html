@@ -724,7 +724,16 @@ function seccionHTML(nodo, path, nivel){
 }
 function renderDoc(){
   anclas.length = 0;
-  $('#body').innerHTML = N.estructura.map((n,i) => seccionHTML(n, [i], 1)).join('');
+  let html = N.estructura.map((n,i) => seccionHTML(n, [i], 1)).join('');
+  // Los artículos que no cuelgan de ninguna sección del índice —el «Artículo
+  // transitorio» del Procesal Penal, por ejemplo— existen en los datos pero
+  // no los alcanza el recorrido del índice. Se dibujan igual, al final: un
+  // artículo invisible es peor que un artículo mal ubicado.
+  const enIndice = new Set();
+  (function juntar(ns){ for (const n of ns){ (n.arts||[]).forEach(a => enIndice.add(a)); juntar(n.hijos||[]); } })(N.estructura);
+  const sueltos = N.articulos.filter(a => !enIndice.has(a.n));
+  if (sueltos.length) html += sueltos.map(a => artHTML(a.n)).join('');
+  $('#body').innerHTML = html;
   renderMyNotes();
 }
 function renderToc(libroIdx){
