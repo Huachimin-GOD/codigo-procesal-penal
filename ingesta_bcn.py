@@ -157,24 +157,40 @@ def partir_cabecera(titulo, tipo):
 # «Artículo 1º.-», «Art. 2º.», «ART. 3.» — las tres formas conviven en los
 # códigos chilenos según la época en que se redactaron.
 #
-# El número puede venir seguido de un sufijo, y la BCN lo escribe de cinco
-# maneras distintas según el código y el año. Todas están tomadas del XML real:
+# Si un sufijo no se reconoce, se pierde y el artículo choca con el artículo
+# base: el 32 bis del Código Penal quedaría como un segundo «32».
+LATIN = r"(?:bis|ter|qu[aá]ter|quinquies|sexies|septies|octies|nonies|decies)"
+
+# El número de un artículo chileno puede llevar, en este orden: marca de
+# ordinal, un sufijo latino, una o dos letras, y otro sufijo latino. Todas las
+# combinaciones de abajo existen en el XML de la BCN:
 #
-#     ART. 32. BIS        el sufijo latino después del punto  (Penal)
-#     Artículo 4° bis.-   el sufijo latino pegado al número   (Tributario)
-#     ART. 161 - A.       una letra separada por guion        (Penal)
-#     Artículo 313° a.    una letra en minúscula              (Penal)
-#     ART. 319 a).        una letra con paréntesis            (Penal)
-#     Artículo 226 A.-    una letra separada por espacio      (Procesal Penal)
+#     Artículo 226 A.-           letra separada por espacio      (Procesal Penal)
+#     ART. 32. BIS               latino después del punto        (Penal)
+#     ART. 161 - A.              letra separada por guion        (Penal)
+#     Artículo 313° a.           letra en minúscula              (Penal)
+#     Artículo 313° c Las penas  letra sin puntuación detrás     (Penal)
+#     ART. 319 a).               letra con paréntesis            (Penal)
+#     ART. 483. a)               punto y letra con paréntesis    (Penal)
+#     Artículo 183-AA.-          dos letras                      (del Trabajo)
+#     Artículo 152 quáter Ñ.-    la letra Ñ                      (del Trabajo)
+#     Artículo 152 quáter O bis. latino después de la letra      (del Trabajo)
 #
-# Si alguna no se reconoce, el sufijo se pierde y el artículo choca con el
-# artículo base: el 32 bis del Código Penal quedaría como un segundo «32».
+# Las mayúsculas y minúsculas se distinguen a propósito —(?-i:…) apaga el
+# IGNORECASE solo ahí—: una minúscula suelta seguida de mayúscula es un sufijo
+# («313 c Las»), pero una mayúscula suelta seguida de texto es el comienzo de
+# la oración, no un sufijo.
 NUMERO_ARTICULO = (
-    r"\d+"                                    # el número
-    r"(?:[º°]|o(?=[\s.,\-–]))?"                # marca de ordinal: 1º, 1°, 1o
-    r"(?:\s*[.\-–]?\s*"                       # sufijo latino, con o sin punto delante
-    r"(?:bis|ter|qu[aá]ter|quinquies|sexies|septies|octies|nonies|decies))?"
-    r"(?:\s*[-–]?\s*[A-Za-z](?=\s*[).\-–]|\s*$))?"   # sufijo de una letra
+    r"\d+"                                     # el número
+    r"(?:[º°]|o(?=[\s.,\-–]))?"                 # marca de ordinal: 1º, 1°, 1o
+    r"(?:\s*[.\-–]?\s*" + LATIN + r")?"        # primer sufijo latino
+    r"(?-i:"                                    # las letras, respetando la caja
+    r"(?:\s*[.\-–]?\s*[A-ZÑ]{1,2}"
+    r"(?=\s*[).\-–]|\s+" + LATIN + r"\b|\s*$))"
+    r"|(?:\s*[.\-–]?\s*[a-zñ](?=\s*[).\-–]|\s*$))"
+    r"|(?:\s*[a-zñ](?=\s+[A-ZÁÉÍÓÚÑ¿«“]))"
+    r")?"
+    r"(?:\s*" + LATIN + r")?"                   # segundo sufijo latino: «O bis»
 )
 
 RX_ART = re.compile(
@@ -196,7 +212,7 @@ SUFIJOS_LATINOS = ("bis", "ter", "quater", "quáter", "quinquies", "sexies",
 
 
 def normaliza_num(n):
-    """Deja todas las formas en una sola: «32 bis», «161 A», «313 a».
+    """Deja todas las formas en una sola: «32 bis», «183 AA», «152 quáter O bis».
 
     Sin esto, «ART. 32. BIS» y «Artículo 32 bis» serían dos artículos distintos
     en el mismo código, y ninguno de los dos se encontraría al buscar el otro.
@@ -204,10 +220,9 @@ def normaliza_num(n):
     n = n.replace("º", "").replace("°", "")
     n = re.sub(r"^(\d+)o\b", r"\1", n)        # «1o» es «1º» escrito sin el símbolo
     n = re.sub(r"[.\-–]", " ", n)               # el punto y el guion solo separan
-    n = re.sub(r"\s+", " ", n).strip()
-    partes = n.split(" ")
-    if len(partes) > 1 and partes[1].lower() in SUFIJOS_LATINOS:
-        partes[1] = partes[1].lower()           # el sufijo latino siempre en minúscula
+    partes = [p for p in n.split() if p]
+    # El sufijo latino siempre en minúscula; las letras se dejan como vienen.
+    partes = [p.lower() if p.lower() in SUFIJOS_LATINOS else p for p in partes]
     return " ".join(partes)
 
 
@@ -238,30 +253,45 @@ def partir_articulo(incisos):
     return num, epi, cuerpo
 
 
+# Para ordenar: cada parte del número pesa mil veces menos que la anterior,
+# así «152 quáter O bis» cae justo después de «152 quáter O» y antes de
+# «152 quáter P», sin necesidad de comparar cadenas.
+LATINOS_ORDEN = {"bis": 1, "ter": 2, "quater": 3, "quáter": 3, "quinquies": 4,
+                 "sexies": 5, "septies": 6, "octies": 7, "nonies": 8, "decies": 9}
+ALFABETO = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ"
+
+
+def _valor_letras(s):
+    """«A» → 1, «Z» → 26, «AA» → 28. La Ñ va donde corresponde en español."""
+    v = 0
+    for ch in s.upper():
+        i = ALFABETO.find(ch)
+        if i < 0:
+            return 0
+        v = v * 27 + (i + 1)
+    return v
+
+
 def orden(num):
     # El articulado transitorio va después de todo el permanente, aunque sus
     # números vuelvan a empezar en 1.
-    n = num.lower()
+    n = num.strip().lower()
     desplazamiento = 0.0
     if n.endswith(" transitorio"):
         desplazamiento = 1e6
-        n = n[: -len(" transitorio")]
+        n = n[: -len(" transitorio")].strip()
     if n in ("transitorio", "final", "único"):
         return 2e6 + {"transitorio": 1, "único": 2, "final": 3}[n]
-    m = re.match(r"^(\d+)(?:\s*(bis|ter|qu[aá]ter|quinquies|sexies|septies|octies|nonies|decies))?"
-                 r"(?:\s*([A-Za-z]))?$", n, re.IGNORECASE)
-    if not m:
+
+    partes = n.split()
+    if not partes or not partes[0].isdigit():
         return 0.0
-    return desplazamiento + _orden_base(m)
-
-
-def _orden_base(m):
-    sufijos = {"bis": .1, "ter": .2, "quater": .3, "quáter": .3, "quinquies": .4,
-               "sexies": .5, "septies": .6, "octies": .7, "nonies": .8, "decies": .9}
-    s = (m.group(2) or "").lower()
-    letra = (m.group(3) or "").upper()
-    extra = (ord(letra) - 64) / 1000 if letra else 0.0
-    return float(m.group(1)) + sufijos.get(s, 0.05 if s else 0.0) + extra
+    valor = float(partes[0])
+    escala = 1.0
+    for p in partes[1:]:
+        escala /= 1000.0
+        valor += escala * (LATINOS_ORDEN.get(p) or _valor_letras(p))
+    return desplazamiento + valor
 
 
 # ---------------------------------------------------------------- recorrido
