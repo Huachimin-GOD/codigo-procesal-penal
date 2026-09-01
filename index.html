@@ -894,7 +894,7 @@ function toast(msg){
 }
 
 /* Uso sin conexión. Solo tiene sentido servido por https, no con doble clic. */
-if ('serviceWorker' in navigator && location.protocol === 'https:'){
+if ('serviceWorker' in navigator && location.protocol !== 'file:'){
   addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 
