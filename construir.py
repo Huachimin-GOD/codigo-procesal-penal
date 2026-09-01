@@ -67,6 +67,83 @@ def selector(actual):
             + "".join(partes) + "</nav>")
 
 
+def ficha(codigo, info, base):
+    """Datos estructurados: qué es esta página, para un buscador.
+
+    Sin esto un buscador ve una página de texto y tiene que adivinar. Con esto
+    sabe que es una ley chilena, cuál, de qué fecha, y que el sitio se puede
+    buscar desde «?q=». Se arma aquí y no en shell.html porque los valores ya
+    están leídos del JSON: así la ficha no puede contradecir a la página.
+    """
+    grafo = [
+        {
+            "@type": "Legislation",
+            "name": f"{codigo['nombre']} de Chile",
+            "alternateName": codigo["nombre"],
+            "legislationIdentifier": info["ley"],
+            "legislationType": "Código",
+            "legislationJurisdiction": {"@type": "Country", "name": "Chile"},
+            "inLanguage": "es-CL",
+            "url": base,
+            "dateModified": info["fecha"],
+            "isBasedOn": f"https://www.bcn.cl/leychile/navegar?idNorma={codigo['id']}",
+            "sourceOrganization": {
+                "@type": "Organization",
+                "name": "Biblioteca del Congreso Nacional de Chile",
+                "url": "https://www.bcn.cl/leychile",
+            },
+            "description": (f"Los {info['articulos']} artículos del {codigo['nombre']} "
+                            f"({info['ley']}), {info['etiqueta']} {info['fecha']}."),
+        },
+        {
+            "@type": "WebSite",
+            "name": f"{codigo['nombre']} de Chile",
+            "url": base,
+            "inLanguage": "es-CL",
+            "potentialAction": {
+                "@type": "SearchAction",
+                "target": {"@type": "EntryPoint", "urlTemplate": base + "?q={consulta}"},
+                "query-input": "required name=consulta",
+            },
+        },
+    ]
+    texto = json.dumps({"@context": "https://schema.org", "@graph": grafo},
+                       ensure_ascii=False, indent=1)
+    # «</» dentro de un <script> cerraría la etiqueta antes de tiempo
+    texto = texto.replace("</", "<\\/")
+    return f'<script type="application/ld+json">\n{texto}\n</script>\n'
+
+
+def indice_del_sitio(construidos):
+    """robots.txt y sitemap.xml.
+
+    El sitemap es la lista de las páginas con su fecha: es lo que se entrega
+    en Search Console para que el buscador sepa qué hay y cuándo cambió.
+    """
+    urls = []
+    for codigo, info in construidos:
+        base = BASE_PUBLICA + (f"{codigo['carpeta']}/" if codigo["carpeta"] else "")
+        urls.append("  <url>\n"
+                    f"    <loc>{base}</loc>\n"
+                    f"    <lastmod>{info['fecha']}</lastmod>\n"
+                    "    <changefreq>weekly</changefreq>\n"
+                    "  </url>")
+    mapa = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+            + "\n".join(urls) + "\n</urlset>\n")
+    (SITIO / "sitemap.xml").write_text(mapa, encoding="utf-8")
+
+    # Aviso honesto: en GitHub Pages el robots.txt que los buscadores leen es
+    # el de la raíz del dominio, no el de este subdirectorio. Se deja igual
+    # porque no estorba y queda correcto si algún día hay dominio propio; el
+    # sitemap se entrega a mano en Search Console.
+    (SITIO / "robots.txt").write_text(
+        "User-agent: *\n"
+        "Allow: /\n"
+        f"Sitemap: {BASE_PUBLICA}sitemap.xml\n", encoding="utf-8")
+    return len(urls)
+
+
 def construir(codigo):
     info = datos_de(codigo)
     if info is None:
@@ -96,6 +173,7 @@ def construir(codigo):
         "<!doctype html>\n"
         '<html lang="es-CL">\n'
         "<head>\n" + cabeza.strip() + "\n"
+        + ficha(codigo, info, base) +
         "</head>\n"
         "<body>\n" + salto + cuerpo.strip() + "\n"
         "</body>\n"
@@ -129,7 +207,8 @@ def construir(codigo):
     trabajador(codigo, carpeta)
 
     for necesario in ("<!doctype html>", 'lang="es-CL"', "<head>", "<body>",
-                      archivo_datos, 'class="salto"', "<meta charset"):
+                      archivo_datos, 'class="salto"', "<meta charset",
+                      'type="application/ld+json"', "<title>"):
         if necesario not in documento:
             sys.exit(f"FALTA en {codigo['slug']}: {necesario}")
 
@@ -172,7 +251,7 @@ def trabajador(codigo, carpeta):
 
 def main():
     pedidos = sys.argv[1:]
-    hechos = 0
+    hechos = []
     for c in CODIGOS:
         if pedidos and c["slug"] not in pedidos:
             continue
@@ -183,9 +262,18 @@ def main():
         destino, largo, info = r
         print(f"{destino.relative_to(RAIZ)} · {largo:,} caracteres · "
               f"{info['articulos']} artículos · {info['fecha']}")
-        hechos += 1
+        hechos.append((c, info))
     if not hechos:
         sys.exit("no se construyó ninguna página")
+
+    # El sitemap enumera todo lo publicado, no solo lo que se acaba de armar:
+    # un sitemap parcial le diría al buscador que las demás páginas ya no están.
+    todos = []
+    for c in CODIGOS:
+        info = datos_de(c)
+        if info and (SITIO / c["carpeta"] / "index.html").exists():
+            todos.append((c, info))
+    print(f"sitemap.xml con {indice_del_sitio(todos)} páginas · robots.txt")
     print("estructura verificada")
 
 
