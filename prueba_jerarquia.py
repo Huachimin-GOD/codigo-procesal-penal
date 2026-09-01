@@ -209,6 +209,19 @@ CASOS = [
     ("Artículo 4° bis.- Las obligaciones",        "4 bis",    "Tributario"),
     ("Artículo 4º ter.- Los hechos imponibles",   "4 ter",    "Tributario"),
     ("Art. 1o Las disposiciones de este Código",  "1",        "del Trabajo"),
+    # El Código del Trabajo agrega tres formas más, todas del XML real.
+    ("Artículo 313° c Las penas señaladas",       "313 c",    "Penal"),
+    ("ART. 483. a) El contador o cualquiera",     "483 a",    "Penal"),
+    ("Artículo 152 quáter Ñ.- El trabajador",     "152 quáter Ñ",     "del Trabajo"),
+    ("Artículo 152 quáter O bis.- El empleador",  "152 quáter O bis", "del Trabajo"),
+    ("Artículo 152 quáter O ter.- La obligación", "152 quáter O ter", "del Trabajo"),
+    ("Artículo 152 quinquies A.- Del aviso",      "152 quinquies A",  "del Trabajo"),
+    ("Artículo 183-Ñ.- Podrá celebrarse",         "183 Ñ",    "del Trabajo"),
+    ("Artículo 183-AA.- La usuaria que contrate", "183 AA",   "del Trabajo"),
+    # Y los que NO deben tocarse: una mayúscula suelta es el inicio del texto.
+    ("ART. 5. El que matare a otro",              "5",        "Penal"),
+    ("ART. 313. El que, sin hallarse autorizado", "313",      "Penal"),
+    ("ART. 483. Se presume responsable",          "483",      "Penal"),
 ]
 
 for encabezado, esperado, codigo in CASOS:
@@ -233,6 +246,13 @@ comprobar("Penal: el 32 bis va después del 32 y antes del 33",
 comprobar("Penal: el 161 A va después del 161 y antes del 161 B",
           ing.orden("161") < ing.orden("161 A") < ing.orden("161 B"),
           f"{ing.orden('161')} < {ing.orden('161 A')} < {ing.orden('161 B')}")
+comprobar("del Trabajo: el «O bis» cae entre el «O» y el «P»",
+          ing.orden("152 quáter O") < ing.orden("152 quáter O bis")
+          < ing.orden("152 quáter O ter") < ing.orden("152 quáter P"))
+comprobar("del Trabajo: «183 AA» va después de «183 Z», no antes",
+          ing.orden("183 Z") < ing.orden("183 AA") < ing.orden("183 AB"))
+comprobar("del Trabajo: la Ñ va entre la N y la O, como en español",
+          ing.orden("183 N") < ing.orden("183 Ñ") < ing.orden("183 O"))
 
 # --------------------------------------------------- 7. los transitorios
 # El articulado transitorio vuelve a numerar desde 1. La BCN lo marca con un
