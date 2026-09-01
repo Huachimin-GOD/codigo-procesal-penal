@@ -503,7 +503,7 @@ article.art{border-bottom:1px solid var(--line)}
         </div>
         <div class="railcard">
           <b>Fuente</b>
-          Biblioteca del Congreso Nacional, <a href="https://www.bcn.cl/leychile/navegar?idNorma=176595" target="_blank" rel="noopener">Ley Chile</a>. Texto refundido al <span id="lastv"></span>. Consulta siempre la versión oficial antes de citar.
+          Biblioteca del Congreso Nacional, <a href="https://www.bcn.cl/leychile/navegar?idNorma=176595" target="_blank" rel="noopener">Ley Chile</a>. <span id="lastvLabel">Texto refundido al</span> <span id="lastv"></span>. Consulta siempre la versión oficial antes de citar.
         </div>
       </aside>
     </div>
@@ -591,15 +591,22 @@ const derogados = N.articulos.filter(a => a.d).length;
 const menores = new Set(['de','del','la','las','los','el','y','e','en','para']);
 const capital = t => t.toLowerCase().split(/\s+/).map((w,i) =>
   (i && menores.has(w)) ? w : w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+// La BCN no siempre declara la fecha de la versión: en algunos códigos publica
+// el centinela 2222-02-02. Cuando la ingesta tuvo que deducirla de la última
+// modificación del archivo, el pie lo dice con esas palabras y no otras.
+const ETIQ_VERSION = N.versionInferida
+  ? 'Última modificación incorporada al '
+  : 'Texto refundido al ';
 $('#sub').textContent = capital(N.organismo || '') + ' · República de Chile · Texto oficial de Ley Chile (BCN)';
 $('#meta').innerHTML = [
   ['live', N.ley], ['', N.articulos.length + ' artículos'],
   ['', 'Publicada ' + fecha(N.publicacion)],
-  ['', 'Texto refundido al ' + fecha(N.ultimaVersion)],
+  ['', ETIQ_VERSION + fecha(N.ultimaVersion)],
   ['', derogados + ' derogados']
 ].map(([c,t]) => `<span class="tag ${c}">${esc(t)}</span>`).join('');
 $('#lastv').textContent = fecha(N.ultimaVersion);
-$('#barSub').textContent = 'Texto refundido al ' + fecha(N.ultimaVersion);
+$('#lastvLabel').textContent = ETIQ_VERSION.trim();
+$('#barSub').textContent = ETIQ_VERSION + fecha(N.ultimaVersion);
 $('#crestSub').textContent = N.ley.toUpperCase().replace(/\s/g,' ') + ' · CHILE';
 $('#openSearch').querySelector('span').textContent = 'Buscar en ' + N.articulos.length + ' artículos';
 $('#avisoDatos').innerHTML = [
@@ -765,7 +772,7 @@ document.addEventListener('click', e => {
   if (g){ goto(g.dataset.goto); return; }
   const c = e.target.closest('[data-copy]');
   if (c){ const a = byNum.get(c.dataset.copy);
-    const txt = `Artículo ${a.n} del Código Procesal Penal (${N.ley})${a.epi ? ' — ' + a.epi : ''}.\n\n${a.p.join('\n\n')}\n\nFuente: BCN, Ley Chile. Texto refundido al ${fecha(N.ultimaVersion)}.`;
+    const txt = `Artículo ${a.n} del Código Procesal Penal (${N.ley})${a.epi ? ' — ' + a.epi : ''}.\n\n${a.p.join('\n\n')}\n\nFuente: BCN, Ley Chile. ${ETIQ_VERSION}${fecha(N.ultimaVersion)}.`;
     navigator.clipboard?.writeText(txt).then(() => toast('Cita copiada'), () => toast('No se pudo copiar')); return; }
   const l = e.target.closest('[data-link]');
   if (l){ const url = location.href.split('#')[0] + '#' + slug(l.dataset.link);
