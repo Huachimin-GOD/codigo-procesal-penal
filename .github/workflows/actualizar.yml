@@ -17,6 +17,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Probar el parser antes de tocar nada
+        run: python3 prueba_jerarquia.py
+
       - name: Descargar desde la BCN y convertir
         run: python3 ingesta_bcn.py 176595 -o datos/cpp.json --js datos/cpp.js
 
@@ -27,6 +30,8 @@ jobs:
           d = json.load(open("datos/cpp.json", encoding="utf-8"))
           assert len(d["articulos"]) > 500, "faltan articulos: no se publica"
           assert d["estructura"], "sin jerarquia: no se publica"
+          f = d["ultimaVersion"]
+          assert len(f) == 10 and "1800" <= f[:4] <= "2100", f"fecha imposible: {f}"
           print(len(d["articulos"]), "articulos validados")
           PY
 
