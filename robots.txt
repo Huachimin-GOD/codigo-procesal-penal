@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://australcode-1.github.io/codigo-procesal-penal/sitemap.xml

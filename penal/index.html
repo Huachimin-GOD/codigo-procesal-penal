@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#FAF8F4" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16130F" media="(prefers-color-scheme: dark)">
 <link rel="canonical" href="https://australcode-1.github.io/codigo-procesal-penal/penal/">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="../iconos/icono-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="../iconos/apple-touch-icon.png">
@@ -438,6 +439,48 @@ article.art{border-bottom:1px solid var(--line)}
 .toc a{border-left:2px solid var(--line)}
 .aviso{border-top:2px solid var(--line-strong)}
 </style>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Legislation",
+   "name": "Código Penal de Chile",
+   "alternateName": "Código Penal",
+   "legislationIdentifier": "Código PENAL",
+   "legislationType": "Código",
+   "legislationJurisdiction": {
+    "@type": "Country",
+    "name": "Chile"
+   },
+   "inLanguage": "es-CL",
+   "url": "https://australcode-1.github.io/codigo-procesal-penal/penal/",
+   "dateModified": "2026-08-20",
+   "isBasedOn": "https://www.bcn.cl/leychile/navegar?idNorma=1984",
+   "sourceOrganization": {
+    "@type": "Organization",
+    "name": "Biblioteca del Congreso Nacional de Chile",
+    "url": "https://www.bcn.cl/leychile"
+   },
+   "description": "Los 677 artículos del Código Penal (Código PENAL), última modificación incorporada al 2026-08-20."
+  },
+  {
+   "@type": "WebSite",
+   "name": "Código Penal de Chile",
+   "url": "https://australcode-1.github.io/codigo-procesal-penal/penal/",
+   "inLanguage": "es-CL",
+   "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+     "@type": "EntryPoint",
+     "urlTemplate": "https://australcode-1.github.io/codigo-procesal-penal/penal/?q={consulta}"
+    },
+    "query-input": "required name=consulta"
+   }
+  }
+ ]
+}
+</script>
 </head>
 <body>
 <a class="salto" href="#doc">Saltar al articulado</a>
@@ -1026,6 +1069,18 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:'){
 })();
 renderTree(''); renderDoc(); renderToc(0); renderResults(''); spy();
 if (location.hash) setTimeout(() => goto(location.hash.slice(1), false), 80);
+
+/* Buscar desde fuera del sitio: «…/?q=allanamiento» abre el buscador con esa
+   consulta ya escrita. Sirve para enlazar una búsqueda, para el atajo de la
+   barra de direcciones del navegador y para la ficha de datos estructurados,
+   que declara esta misma dirección como forma de buscar en el sitio. */
+(() => {
+  const consulta = new URLSearchParams(location.search).get('q');
+  if (!consulta) return;
+  qEl.value = consulta;
+  renderResults(consulta);
+  openSearch();
+})();
 </script>
 </body>
 </html>
