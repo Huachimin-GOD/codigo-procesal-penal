@@ -7,7 +7,7 @@
  */
 
 // Cada código lleva su propia caché: actualizar uno no invalida los otros.
-const CACHE = 'cpp-v3';
+const CACHE = 'trabajo-v3';
 
 // Lo mínimo para que el sitio arranque sin conexión.
 // Solo la portada y el documento: los datos de la norma entran a la caché

@@ -1,7 +1,7 @@
 {
-  "name": "Código Procesal Penal de Chile",
-  "short_name": "CPP Chile",
-  "description": "Lector del Código Procesal Penal (Ley 19.696) generado desde el XML oficial de Ley Chile. Sitio no oficial.",
+  "name": "Código Penal de Chile",
+  "short_name": "Penal Chile",
+  "description": "Lector del Código Penal (Código PENAL) generado desde el XML oficial de Ley Chile. Sitio no oficial.",
   "lang": "es-CL",
   "dir": "ltr",
   "start_url": ".",
@@ -17,19 +17,19 @@
   ],
   "icons": [
     {
-      "src": "iconos/icono-192.png",
+      "src": "../iconos/icono-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "iconos/icono-512.png",
+      "src": "../iconos/icono-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "iconos/icono-512.png",
+      "src": "../iconos/icono-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
