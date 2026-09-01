@@ -196,7 +196,7 @@ NUMERO_ARTICULO = (
 RX_ART = re.compile(
     r"^\s*(?:art[íi]culos?|arts?)\.?\s*"
     r"(" + NUMERO_ARTICULO + r")"
-    r"\s*[.\-–]*\s*(.*)$",
+    r"\s*[).\-–]*\s*(.*)$",   # el «)» de «483. a)» tampoco es parte del texto
     re.IGNORECASE | re.DOTALL,
 )
 
@@ -427,7 +427,19 @@ def recorrer(nodos, articulos, ruta, transitorio=False):
         antes = len(articulos)
         rama["hijos"] = recorrer(hijos_de(ef), articulos,
                                  ruta + [f"{tipo} {numero}".strip()], es_trans)
-        rama["arts"] = [a["n"] for a in articulos[antes:]] if not rama["hijos"] else []
+        # Los artículos que quedaron colgando de esta rama y no de sus hijas.
+        # Antes se descartaban cuando la rama tenía hijas, y esos artículos
+        # desaparecían de la pantalla aunque estuvieran en los datos: en el
+        # Código Penal eran el 25 y el 26.
+        de_las_hijas = set()
+
+        def juntar(ramas_hijas):
+            for h in ramas_hijas:
+                de_las_hijas.update(h["arts"])
+                juntar(h["hijos"])
+
+        juntar(rama["hijos"])
+        rama["arts"] = [a["n"] for a in articulos[antes:] if a["n"] not in de_las_hijas]
         ramas.append(rama)
     return ramas
 
