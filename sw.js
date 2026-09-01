@@ -6,7 +6,7 @@
  * teniendo señal, y quien está sin señal igual puede trabajar.
  */
 
-const CACHE = 'cpp-v1';
+const CACHE = 'cpp-v2';
 
 // Lo mínimo para que el sitio arranque sin conexión.
 const BASE = [
@@ -72,6 +72,10 @@ self.addEventListener('fetch', evento => {
 
   const url = new URL(peticion.url);
   const propio = url.origin === self.location.origin;
+
+  // Las estadísticas nunca se guardan en caché: si se guardaran, el contador
+  // devolvería la respuesta vieja y dejaría de registrar visitas.
+  if (url.hostname.endsWith('goatcounter.com') || url.hostname.endsWith('zgo.at')) return;
 
   // El documento y los datos de la ley: siempre lo más nuevo que haya.
   if (peticion.mode === 'navigate' || (propio && url.pathname.includes('/datos/'))) {

@@ -516,6 +516,10 @@ article.art{border-bottom:1px solid var(--line)}
 
 <div class="toast" id="toast"></div>
 
+<!-- Estadísticas sin cookies ni seguimiento de personas. Panel: https://leyesacademicocl.goatcounter.com -->
+<script data-goatcounter="https://leyesacademicocl.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+
 <script src="datos/cpp.js"></script>
 <script>
 const store = {
@@ -711,6 +715,23 @@ function renderMyNotes(){
 }
 
 /* ---------- navegación ---------- */
+
+/* ---------- qué artículos se consultan ----------
+   Solo el número del artículo. Sin cookies, sin identificar a nadie. */
+let tCuenta;
+function contarArticulo(n){
+  clearTimeout(tCuenta);
+  tCuenta = setTimeout(() => {
+    const a = byNum.get(n);
+    if (!a || !window.goatcounter || !window.goatcounter.count) return;
+    window.goatcounter.count({
+      path: 'articulo/' + n.replace(/\s+/g, '-'),
+      title: 'Art. ' + a.n + (a.epi ? ' — ' + a.epi : ''),
+      event: false
+    });
+  }, 1200);
+}
+
 function goto(id, push){
   const el = document.getElementById(id);
   if (!el) return;
@@ -720,6 +741,7 @@ function goto(id, push){
     el.setAttribute('data-hot','true');
     document.querySelectorAll('.chip[aria-current="true"]').forEach(x => x.removeAttribute('aria-current'));
     document.querySelector(`.chip[data-goto="${id}"]`)?.setAttribute('aria-current','true');
+    contarArticulo(el.dataset.art);
   }
   if (push !== false) history.replaceState(null, '', '#' + id);
   closeSide();
