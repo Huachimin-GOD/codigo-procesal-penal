@@ -156,11 +156,30 @@ def partir_cabecera(titulo, tipo):
 
 # «Artículo 1º.-», «Art. 2º.», «ART. 3.» — las tres formas conviven en los
 # códigos chilenos según la época en que se redactaron.
+#
+# El número puede venir seguido de un sufijo, y la BCN lo escribe de cinco
+# maneras distintas según el código y el año. Todas están tomadas del XML real:
+#
+#     ART. 32. BIS        el sufijo latino después del punto  (Penal)
+#     Artículo 4° bis.-   el sufijo latino pegado al número   (Tributario)
+#     ART. 161 - A.       una letra separada por guion        (Penal)
+#     Artículo 313° a.    una letra en minúscula              (Penal)
+#     ART. 319 a).        una letra con paréntesis            (Penal)
+#     Artículo 226 A.-    una letra separada por espacio      (Procesal Penal)
+#
+# Si alguna no se reconoce, el sufijo se pierde y el artículo choca con el
+# artículo base: el 32 bis del Código Penal quedaría como un segundo «32».
+NUMERO_ARTICULO = (
+    r"\d+"                                    # el número
+    r"(?:[º°]|o(?=[\s.,\-–]))?"                # marca de ordinal: 1º, 1°, 1o
+    r"(?:\s*[.\-–]?\s*"                       # sufijo latino, con o sin punto delante
+    r"(?:bis|ter|qu[aá]ter|quinquies|sexies|septies|octies|nonies|decies))?"
+    r"(?:\s*[-–]?\s*[A-Za-z](?=\s*[).\-–]|\s*$))?"   # sufijo de una letra
+)
+
 RX_ART = re.compile(
     r"^\s*(?:art[íi]culos?|arts?)\.?\s*"
-    r"(\d+[º°]?"
-    r"(?:\s*(?:bis|ter|qu[aá]ter|quinquies|sexies|septies|octies|nonies|decies))?"
-    r"(?:\s+[A-Z](?=\s*[.\-–]))?)"
+    r"(" + NUMERO_ARTICULO + r")"
     r"\s*[.\-–]*\s*(.*)$",
     re.IGNORECASE | re.DOTALL,
 )
@@ -172,9 +191,24 @@ RX_ART_SIN_NUMERO = re.compile(
 )
 
 
+SUFIJOS_LATINOS = ("bis", "ter", "quater", "quáter", "quinquies", "sexies",
+                   "septies", "octies", "nonies", "decies")
+
+
 def normaliza_num(n):
-    n = re.sub(r"\s+", " ", n.replace("º", "").replace("°", "")).strip()
-    return n
+    """Deja todas las formas en una sola: «32 bis», «161 A», «313 a».
+
+    Sin esto, «ART. 32. BIS» y «Artículo 32 bis» serían dos artículos distintos
+    en el mismo código, y ninguno de los dos se encontraría al buscar el otro.
+    """
+    n = n.replace("º", "").replace("°", "")
+    n = re.sub(r"^(\d+)o\b", r"\1", n)        # «1o» es «1º» escrito sin el símbolo
+    n = re.sub(r"[.\-–]", " ", n)               # el punto y el guion solo separan
+    n = re.sub(r"\s+", " ", n).strip()
+    partes = n.split(" ")
+    if len(partes) > 1 and partes[1].lower() in SUFIJOS_LATINOS:
+        partes[1] = partes[1].lower()           # el sufijo latino siempre en minúscula
+    return " ".join(partes)
 
 
 def partir_articulo(incisos):
@@ -205,13 +239,23 @@ def partir_articulo(incisos):
 
 
 def orden(num):
-    # Los transitorios y finales van al final, después del articulado permanente.
-    if num.lower() in ("transitorio", "final", "único"):
-        return 1e6 + {"transitorio": 1, "único": 2, "final": 3}[num.lower()]
+    # El articulado transitorio va después de todo el permanente, aunque sus
+    # números vuelvan a empezar en 1.
+    n = num.lower()
+    desplazamiento = 0.0
+    if n.endswith(" transitorio"):
+        desplazamiento = 1e6
+        n = n[: -len(" transitorio")]
+    if n in ("transitorio", "final", "único"):
+        return 2e6 + {"transitorio": 1, "único": 2, "final": 3}[n]
     m = re.match(r"^(\d+)(?:\s*(bis|ter|qu[aá]ter|quinquies|sexies|septies|octies|nonies|decies))?"
-                 r"(?:\s*([A-Z]))?$", num, re.IGNORECASE)
+                 r"(?:\s*([A-Za-z]))?$", n, re.IGNORECASE)
     if not m:
         return 0.0
+    return desplazamiento + _orden_base(m)
+
+
+def _orden_base(m):
     sufijos = {"bis": .1, "ter": .2, "quater": .3, "quáter": .3, "quinquies": .4,
                "sexies": .5, "septies": .6, "octies": .7, "nonies": .8, "decies": .9}
     s = (m.group(2) or "").lower()
@@ -303,11 +347,19 @@ def es_indice(ef, tipo):
     return bool(titulo_de(ef)) or tipo.lower() in TIPOS_ESTRUCTURA
 
 
-def recorrer(nodos, articulos, ruta):
+def recorrer(nodos, articulos, ruta, transitorio=False):
+    """Recorre el árbol de la norma juntando artículos y armando el índice.
+
+    `transitorio` se hereda hacia abajo: la BCN marca los nodos con un atributo
+    propio, y los artículos transitorios vuelven a numerar desde 1. Sin
+    distinguirlos, el Código Tributario tendría dos artículos «1» y el enlace a
+    uno llevaría al otro.
+    """
     ramas = []
     for ef in nodos:
         tipo = (ef.get("tipoParte") or "Sección").strip()
         derogado = (ef.get("derogado") or "").lower().startswith("derog")
+        es_trans = transitorio or (ef.get("transitorio") or "").strip().lower() == "transitorio"
 
         if tipo.lower().startswith("art"):
             propios = incisos_de(ef)
@@ -318,6 +370,9 @@ def recorrer(nodos, articulos, ruta):
                 if not cuerpo:
                     for hijo in hijos_de(ef):
                         cuerpo += incisos_de(hijo)
+                # «1» del articulado transitorio no es el «1» del permanente.
+                if es_trans and num.lower() not in ("transitorio", "final", "único"):
+                    num = f"{num} transitorio"
                 desde = ef.get("fechaVersion") or ""
                 articulos.append({
                     "n": num, "ord": orden(num), "epi": epi, "p": cuerpo,
@@ -327,12 +382,12 @@ def recorrer(nodos, articulos, ruta):
                 })
             # Bajar igual, y quedarse con lo que traiga: hay códigos que anidan
             # artículos —y códigos enteros— dentro de nodos de tipo «Artículo».
-            ramas.extend(recorrer(hijos_de(ef), articulos, ruta))
+            ramas.extend(recorrer(hijos_de(ef), articulos, ruta, es_trans))
             continue
 
         if not es_indice(ef, tipo):
             # Envoltorio sin nombre: se atraviesa y lo que haya adentro sube.
-            ramas.extend(recorrer(hijos_de(ef), articulos, ruta))
+            ramas.extend(recorrer(hijos_de(ef), articulos, ruta, es_trans))
             continue
 
         titulo = titulo_de(ef) or " ".join(incisos_de(ef)[:2])
@@ -340,7 +395,8 @@ def recorrer(nodos, articulos, ruta):
         rama = {"tipo": tipo, "num": numero, "nombre": nombre or titulo,
                 "hijos": [], "arts": [], "derogado": derogado}
         antes = len(articulos)
-        rama["hijos"] = recorrer(hijos_de(ef), articulos, ruta + [f"{tipo} {numero}".strip()])
+        rama["hijos"] = recorrer(hijos_de(ef), articulos,
+                                 ruta + [f"{tipo} {numero}".strip()], es_trans)
         rama["arts"] = [a["n"] for a in articulos[antes:]] if not rama["hijos"] else []
         ramas.append(rama)
     return ramas
