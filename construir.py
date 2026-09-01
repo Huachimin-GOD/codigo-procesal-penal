@@ -19,10 +19,9 @@ import json
 import pathlib
 import sys
 
-from codigos import CODIGOS, hacia_raiz, ruta_datos
+from codigos import CODIGOS, SITIO, hacia_raiz, ruta_datos
 
 RAIZ = pathlib.Path(__file__).parent
-SITIO = RAIZ / "sitio"
 BASE_PUBLICA = "https://australcode-1.github.io/codigo-procesal-penal/"
 
 
