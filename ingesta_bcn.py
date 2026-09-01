@@ -111,6 +111,29 @@ def incisos_de(nodo):
     return [re.sub(r"\s+", " ", p).strip() for p in partes if p.strip()]
 
 
+def fecha_plausible(f):
+    """¿Es una fecha real y no un centinela de la BCN?
+
+    La BCN publica `2222-02-02` como fecha de la raíz en varios códigos (el
+    Civil y el Penal, entre otros): no es la fecha de la versión, es su marca
+    interna de «sin término». Mostrarla en el pie diría que el texto está
+    refundido al año 2222.
+    """
+    if not f or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", f):
+        return False
+    return 1800 <= int(f[:4]) <= time.gmtime().tm_year + 1
+
+
+# Los tipos de parte que estructuran un código. Todo lo demás que no sea un
+# artículo (Enumeración, Doble Articulado, el preámbulo de promulgación) es
+# envoltorio: se atraviesa sin dejar rastro en el índice.
+TIPOS_ESTRUCTURA = {
+    "libro", "título", "titulo", "capítulo", "capitulo", "párrafo", "parrafo",
+    "parágrafo", "paragrafo", "sección", "seccion", "subsección", "subseccion",
+    "parte", "subtítulo", "subtitulo", "anexo", "apéndice", "apendice",
+}
+
+
 def titulo_de(nodo):
     meta = nodo.find(Q("Metadatos"))
     if meta is None:
@@ -204,6 +227,82 @@ def hijos_de(nodo):
     return list(cont.findall(Q("EstructuraFuncional"))) if cont is not None else []
 
 
+def sin_tildes(s):
+    tabla = str.maketrans("áéíóúüñÁÉÍÓÚÜÑ", "aeiouunAEIOUUN")
+    return s.translate(tabla).lower()
+
+
+def articulados_de(raiz):
+    """Los textos refundidos que fija una norma, con el artículo que los fija.
+
+    Un DFL puede fijar varios de una vez. El idNorma 172986 no es «el Código
+    Civil»: es el DFL 1 de 2000, que fija en un mismo cuerpo el Código Civil,
+    la Ley sobre Registro Civil, la Ley de Menores y tres leyes más. Cada uno
+    numera sus artículos desde el 1, así que publicarlos juntos produciría
+    seis artículos «1», seis «2», y un texto que no es ningún código.
+    """
+    padres = {h: p for p in raiz.iter() for h in p}
+    fuera = []
+    for ef in raiz.iter(Q("EstructuraFuncional")):
+        if (ef.get("tipoParte") or "").strip().lower() != "doble articulado":
+            continue
+        p = padres.get(ef)
+        while p is not None and p.tag != Q("EstructuraFuncional"):
+            p = padres.get(p)
+        propios = incisos_de(p) if p is not None else []
+        fuera.append((ef, propios[0].strip() if propios else "(sin encabezado)"))
+    return fuera
+
+
+def elegir_articulado(raiz, pedido):
+    """Devuelve los nodos de primer nivel del cuerpo legal que corresponde.
+
+    Sin «Doble Articulado» la norma es lo que dice ser y se devuelve entera.
+    Con uno solo, se entra en él: la norma es el decreto que fija el texto, y
+    el texto es lo que está adentro. Con varios hay que decir cuál, porque
+    adivinar sería publicar un código con el contenido de otro.
+    """
+    cont = raiz.find(Q("EstructurasFuncionales"))
+    todo = list(cont.findall(Q("EstructuraFuncional"))) if cont is not None else []
+
+    dobles = articulados_de(raiz)
+    if not dobles:
+        if pedido:
+            raise SystemExit("esta norma no fija textos refundidos: sobra --articulado")
+        return todo, ""
+
+    if pedido:
+        elegidos = [(n, t) for n, t in dobles if sin_tildes(pedido) in sin_tildes(t)]
+        if len(elegidos) != 1:
+            cuales = "\n".join(f"  · {t}" for _, t in dobles)
+            raise SystemExit(
+                f"«{pedido}» calza con {len(elegidos)} de los {len(dobles)} textos "
+                f"que fija esta norma. Los que hay:\n{cuales}")
+        nodo, encabezado = elegidos[0]
+    elif len(dobles) == 1:
+        nodo, encabezado = dobles[0]
+    else:
+        cuales = "\n".join(f"  · {t}" for _, t in dobles)
+        raise SystemExit(
+            f"esta norma fija {len(dobles)} textos refundidos distintos. Hay que "
+            f"elegir uno con --articulado; si no, saldrían mezclados:\n{cuales}")
+
+    return hijos_de(nodo), encabezado
+
+
+def es_indice(ef, tipo):
+    """¿Este nodo merece una entrada en el índice lateral?
+
+    Sí cuando la BCN le puso un título propio, o cuando su tipo es uno de los
+    que arman un código. El resto son envoltorios sin nombre: el Código Civil
+    cuelga sus cuatro Libros dentro de nodos de tipo «Artículo», y el
+    Tributario mete el código entero dentro de uno solo. Si esos envoltorios
+    entraran al índice, aparecerían como renglones vacíos; si no se
+    atravesaran, el índice quedaría vacío del todo.
+    """
+    return bool(titulo_de(ef)) or tipo.lower() in TIPOS_ESTRUCTURA
+
+
 def recorrer(nodos, articulos, ruta):
     ramas = []
     for ef in nodos:
@@ -219,14 +318,21 @@ def recorrer(nodos, articulos, ruta):
                 if not cuerpo:
                     for hijo in hijos_de(ef):
                         cuerpo += incisos_de(hijo)
+                desde = ef.get("fechaVersion") or ""
                 articulos.append({
                     "n": num, "ord": orden(num), "epi": epi, "p": cuerpo,
-                    "derogado": derogado, "desde": ef.get("fechaVersion") or "",
+                    "derogado": derogado,
+                    "desde": desde if fecha_plausible(desde) else "",
                     "ruta": list(ruta),
                 })
-            # Bajar igual: hay códigos que anidan artículos dentro de otros
-            # nodos de tipo «Artículo» o dentro de «Doble Articulado».
-            recorrer(hijos_de(ef), articulos, ruta)
+            # Bajar igual, y quedarse con lo que traiga: hay códigos que anidan
+            # artículos —y códigos enteros— dentro de nodos de tipo «Artículo».
+            ramas.extend(recorrer(hijos_de(ef), articulos, ruta))
+            continue
+
+        if not es_indice(ef, tipo):
+            # Envoltorio sin nombre: se atraviesa y lo que haya adentro sube.
+            ramas.extend(recorrer(hijos_de(ef), articulos, ruta))
             continue
 
         titulo = titulo_de(ef) or " ".join(incisos_de(ef)[:2])
@@ -248,6 +354,11 @@ def main():
     ap.add_argument("-o", "--salida", default="norma.json")
     ap.add_argument("--fecha", help="fechaVersion AAAA-MM-DD")
     ap.add_argument("--xml", help="ruta a un XML ya descargado")
+    ap.add_argument("--js", help="además del JSON, escribe el archivo que carga el lector "
+                                 "(window.NORMA=...), que es como el sitio consume los datos")
+    ap.add_argument("--articulado",
+                    help='cuando la norma fija varios textos refundidos, cuál se '
+                         'quiere (p. ej. "Código Civil")')
     args = ap.parse_args()
 
     crudo = open(args.xml, "rb").read() if args.xml else descargar(args.id_norma, args.fecha)
@@ -265,9 +376,26 @@ def main():
         return re.sub(r"\s+", " ", (nodo.text or "")).strip() if nodo is not None else ""
 
     articulos = []
-    cont = raiz.find(Q("EstructurasFuncionales"))
-    arbol = recorrer(list(cont.findall(Q("EstructuraFuncional"))) if cont is not None else [],
-                     articulos, [])
+    nodos, fijado_por = elegir_articulado(raiz, args.articulado)
+    if fijado_por:
+        print(f"    texto refundido tomado de: {fijado_por[:90]}", file=sys.stderr)
+    arbol = recorrer(nodos, articulos, [])
+
+    # La fecha de la versión. Si la raíz trae el centinela 2222-02-02, se usa
+    # la modificación más reciente que el propio archivo declara: es la fecha
+    # hasta la cual el texto está efectivamente al día, y es verificable.
+    publicacion = (ident.get("fechaPublicacion") if ident is not None else "") or ""
+    ultima = raiz.get("fechaVersion") or args.fecha or ""
+    inferida = False
+    if not fecha_plausible(ultima):
+        candidatas = sorted(f for f in
+                            {e.get("fechaVersion") for e in raiz.iter(Q("EstructuraFuncional"))}
+                            if fecha_plausible(f))
+        origen = ultima or "(vacía)"
+        ultima = candidatas[-1] if candidatas else publicacion
+        inferida = True
+        print(f"    la BCN declara fechaVersion={origen}; uso {ultima}, "
+              f"la modificación más reciente del archivo", file=sys.stderr)
 
     tipo = texto(ident, "TiposNumeros", "TipoNumero", "Tipo")
     numero = texto(ident, "TiposNumeros", "TipoNumero", "Numero")
@@ -280,8 +408,9 @@ def main():
         "ley": f"{tipo} {numero}".strip(),
         "organismo": texto(ident, "Organismos", "Organismo"),
         "promulgacion": (ident.get("fechaPromulgacion") if ident is not None else "") or "",
-        "publicacion": (ident.get("fechaPublicacion") if ident is not None else "") or "",
-        "ultimaVersion": raiz.get("fechaVersion") or args.fecha or "",
+        "publicacion": publicacion,
+        "ultimaVersion": ultima,
+        "versionInferida": inferida,
         "fuente": f"https://www.bcn.cl/leychile/navegar?idNorma={args.id_norma}",
         "estructura": arbol,
         "articulos": sorted(articulos, key=lambda a: a["ord"]),
@@ -289,6 +418,14 @@ def main():
 
     with open(args.salida, "w", encoding="utf-8") as f:
         json.dump(salida, f, ensure_ascii=False, indent=1)
+
+    if args.js:
+        # El lector carga los datos con <script src>, no con fetch: así funciona
+        # también al abrir el archivo con doble clic, sin servidor.
+        with open(args.js, "w", encoding="utf-8") as f:
+            f.write("window.NORMA=")
+            json.dump(salida, f, ensure_ascii=False, separators=(",", ":"))
+            f.write(";")
 
     sin_epi = sum(1 for a in articulos if not a["epi"])
     print(f"{len(articulos)} artículos → {args.salida} "
