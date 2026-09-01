@@ -131,12 +131,20 @@ def partir_cabecera(titulo, tipo):
     return "", titulo.strip()
 
 
+# «Artículo 1º.-», «Art. 2º.», «ART. 3.» — las tres formas conviven en los
+# códigos chilenos según la época en que se redactaron.
 RX_ART = re.compile(
-    r"^\s*Art[íi]culos?\s+"
+    r"^\s*(?:art[íi]culos?|arts?)\.?\s*"
     r"(\d+[º°]?"
     r"(?:\s*(?:bis|ter|qu[aá]ter|quinquies|sexies|septies|octies|nonies|decies))?"
     r"(?:\s+[A-Z](?=\s*[.\-–]))?)"
     r"\s*[.\-–]*\s*(.*)$",
+    re.IGNORECASE | re.DOTALL,
+)
+
+# «Artículo transitorio.-» y «Artículo final»: sin número, pero son artículos.
+RX_ART_SIN_NUMERO = re.compile(
+    r"^\s*(?:art[íi]culos?|arts?)\.?\s+(transitorio|final|[úu]nico)\b\s*[.\-–]*\s*(.*)$",
     re.IGNORECASE | re.DOTALL,
 )
 
@@ -152,6 +160,15 @@ def partir_articulo(incisos):
         return "", "", []
     m = RX_ART.match(incisos[0])
     if not m:
+        sn = RX_ART_SIN_NUMERO.match(incisos[0])
+        if sn:
+            etiqueta = sn.group(1).lower().replace("unico", "único")
+            resto = sn.group(2).strip()
+            epi = ""
+            m2 = re.match(r"^([^.]{3,150}?)\.\s*(?=[A-ZÁÉÍÓÚÑ¿“\"(])(.*)$", resto, re.DOTALL)
+            if m2:
+                epi, resto = m2.group(1).strip(), m2.group(2).strip()
+            return etiqueta, epi, ([resto] if resto else []) + incisos[1:]
         return "", "", incisos
     num = normaliza_num(m.group(1))
     resto = m.group(2).strip()
@@ -165,6 +182,9 @@ def partir_articulo(incisos):
 
 
 def orden(num):
+    # Los transitorios y finales van al final, después del articulado permanente.
+    if num.lower() in ("transitorio", "final", "único"):
+        return 1e6 + {"transitorio": 1, "único": 2, "final": 3}[num.lower()]
     m = re.match(r"^(\d+)(?:\s*(bis|ter|qu[aá]ter|quinquies|sexies|septies|octies|nonies|decies))?"
                  r"(?:\s*([A-Z]))?$", num, re.IGNORECASE)
     if not m:
@@ -191,14 +211,22 @@ def recorrer(nodos, articulos, ruta):
         derogado = (ef.get("derogado") or "").lower().startswith("derog")
 
         if tipo.lower().startswith("art"):
-            num, epi, cuerpo = partir_articulo(incisos_de(ef))
-            if not num:
-                continue
-            articulos.append({
-                "n": num, "ord": orden(num), "epi": epi, "p": cuerpo,
-                "derogado": derogado, "desde": ef.get("fechaVersion") or "",
-                "ruta": list(ruta),
-            })
+            propios = incisos_de(ef)
+            num, epi, cuerpo = partir_articulo(propios)
+            if num:
+                # Si el nodo solo trae el encabezado («ART. 2.») el texto vive
+                # en los nodos hijos: se recoge de ahí antes de seguir.
+                if not cuerpo:
+                    for hijo in hijos_de(ef):
+                        cuerpo += incisos_de(hijo)
+                articulos.append({
+                    "n": num, "ord": orden(num), "epi": epi, "p": cuerpo,
+                    "derogado": derogado, "desde": ef.get("fechaVersion") or "",
+                    "ruta": list(ruta),
+                })
+            # Bajar igual: hay códigos que anidan artículos dentro de otros
+            # nodos de tipo «Artículo» o dentro de «Doble Articulado».
+            recorrer(hijos_de(ef), articulos, ruta)
             continue
 
         titulo = titulo_de(ef) or " ".join(incisos_de(ef)[:2])
