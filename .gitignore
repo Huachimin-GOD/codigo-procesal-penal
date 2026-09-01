@@ -1,3 +1,6 @@
 __pycache__/
+# el XML que baja de la BCN pesa megas y no se versiona
 *.xml
+# el sitemap sí: es parte del sitio publicado
+!sitemap.xml
 .DS_Store
