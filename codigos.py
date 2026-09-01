@@ -14,6 +14,14 @@ leen de aquí. Agregar un código es agregar una línea.
 El Procesal Penal se queda en la raíz a propósito: su dirección ya está
 publicada y compartida, y moverla rompería los enlaces que existen.
 """
+import pathlib
+
+RAIZ = pathlib.Path(__file__).parent
+
+# En el repositorio publicado los archivos del sitio viven en la raíz, junto a
+# los scripts. En el taller local están dentro de «sitio/». Se detecta cuál de
+# las dos formas es, en vez de suponer una y fallar en la otra.
+SITIO = RAIZ / "sitio" if (RAIZ / "sitio").is_dir() else RAIZ
 
 CODIGOS = [
     {
