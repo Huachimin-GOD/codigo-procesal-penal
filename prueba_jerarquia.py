@@ -209,6 +209,8 @@ CASOS = [
     ("Artículo 4° bis.- Las obligaciones",        "4 bis",    "Tributario"),
     ("Artículo 4º ter.- Los hechos imponibles",   "4 ter",    "Tributario"),
     ("Art. 1o Las disposiciones de este Código",  "1",        "del Trabajo"),
+    ("Artículo 1.o Las relaciones laborales",     "1",        "del Trabajo"),
+    ("Artículo 10.o De los contratos",            "10",       "del Trabajo"),
     # El Código del Trabajo agrega tres formas más, todas del XML real.
     ("Artículo 313° c Las penas señaladas",       "313 c",    "Penal"),
     ("ART. 483. a) El contador o cualquiera",     "483 a",    "Penal"),
