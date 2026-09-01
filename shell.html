@@ -4,6 +4,7 @@
 <meta name="theme-color" content="#FAF8F4" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16130F" media="(prefers-color-scheme: dark)">
 <link rel="canonical" href="{{BASE}}">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="{{RAIZ}}iconos/icono-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="{{RAIZ}}iconos/apple-touch-icon.png">
@@ -1019,4 +1020,16 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:'){
 })();
 renderTree(''); renderDoc(); renderToc(0); renderResults(''); spy();
 if (location.hash) setTimeout(() => goto(location.hash.slice(1), false), 80);
+
+/* Buscar desde fuera del sitio: «…/?q=allanamiento» abre el buscador con esa
+   consulta ya escrita. Sirve para enlazar una búsqueda, para el atajo de la
+   barra de direcciones del navegador y para la ficha de datos estructurados,
+   que declara esta misma dirección como forma de buscar en el sitio. */
+(() => {
+  const consulta = new URLSearchParams(location.search).get('q');
+  if (!consulta) return;
+  qEl.value = consulta;
+  renderResults(consulta);
+  openSearch();
+})();
 </script>
