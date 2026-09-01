@@ -168,7 +168,9 @@
          "derogado": false
         }
        ],
-       "arts": [],
+       "arts": [
+        "21"
+       ],
        "derogado": false
       },
       {
@@ -408,7 +410,15 @@
          "derogado": false
         }
        ],
-       "arts": [],
+       "arts": [
+        "145 bis A",
+        "145 bis B",
+        "145 bis C",
+        "145 bis D",
+        "145 bis E",
+        "145 bis F",
+        "145 bis G"
+       ],
        "derogado": false
       },
       {
@@ -523,7 +533,9 @@
          "derogado": false
         }
        ],
-       "arts": [],
+       "arts": [
+        "152 bis A"
+       ],
        "derogado": false
       },
       {
@@ -582,7 +594,18 @@
          "derogado": false
         }
        ],
-       "arts": [],
+       "arts": [
+        "152 quáter G",
+        "152 quáter H",
+        "152 quáter I",
+        "152 quáter J",
+        "152 quáter K",
+        "152 quáter L",
+        "152 quáter M",
+        "152 quáter N",
+        "152 quáter Ñ",
+        "152 quáter O"
+       ],
        "derogado": false
       },
       {
@@ -651,7 +674,9 @@
        "derogado": false
       }
      ],
-     "arts": [],
+     "arts": [
+      "77"
+     ],
      "derogado": false
     },
     {
