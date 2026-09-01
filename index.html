@@ -1,17 +1,31 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Código Procesal Penal de Chile</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
 <style>
 :root{
-  --bg:#F7F8FA; --surface:#FFFFFF; --surface-2:#F0F2F6;
-  --ink:#12161D; --ink-2:#3C4553; --muted:#6B7484; --faint:#98A1B0;
-  --line:#E1E5EC; --line-strong:#CBD2DD;
-  --accent:#2E4A8C; --accent-ink:#FFFFFF; --accent-soft:#E9EEF9; --accent-line:#B9C7E6;
-  --mark:#FFE9A8; --mark-ink:#4A3A00;
-  --amber:#8A5A00; --amber-soft:#FBF0DC;
-  --red:#8C2F2F; --red-soft:#F7E9E9;
-  --shadow:0 1px 2px rgba(18,22,29,.05), 0 8px 24px -12px rgba(18,22,29,.18);
+  --bg:#FAF8F4;
+  --surface:#FFFFFF;
+  --surface-2:#F2EDE5;
+  --ink:#1C1814;
+  --ink-2:#453F38;
+  --muted:#746B61;
+  --faint:#A5998C;
+  --line:#E7E0D5;
+  --line-strong:#D3C8B8;
+  --accent:#8E2B2B;
+  --accent-ink:#FFFFFF;
+  --accent-soft:#F8EAE6;
+  --accent-line:#E2C0B8;
+  --mark:#FBE7A6;
+  --mark-ink:#4A3A00;
+  --amber:#8A5A00;
+  --amber-soft:#FAF0DA;
+  --red:#8C2F2F;
+  --red-soft:#F8EAE6;
+  --shadow:0 1px 2px rgba(28,24,21,.06), 0 8px 24px -12px rgba(28,24,21,.20);
   --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -19,25 +33,57 @@
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#0E1218; --surface:#151A22; --surface-2:#1C232D;
-    --ink:#E7EAF0; --ink-2:#C3CAD6; --muted:#939DAC; --faint:#6E7889;
-    --line:#252D39; --line-strong:#36404F;
-    --accent:#8DA8E8; --accent-ink:#0E1218; --accent-soft:#1A2334; --accent-line:#2E3C58;
-    --mark:#5C4A12; --mark-ink:#FFE9A8;
-    --amber:#D9A84A; --amber-soft:#2A2214;
-    --red:#E08585; --red-soft:#2C1A1A;
-    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  --bg:#16130F;
+  --surface:#1E1A15;
+  --surface-2:#272119;
+  --ink:#F0EBE3;
+  --ink-2:#D0C8BC;
+  --muted:#9D9386;
+  --faint:#776E63;
+  --line:#2F2921;
+  --line-strong:#443B30;
+  --accent:#E79A92;
+  --accent-ink:#16130F;
+  --accent-soft:#2C1D1B;
+  --accent-line:#4D302C;
+  --mark:#5C4A12;
+  --mark-ink:#FBE7A6;
+  --amber:#D9A84A;
+  --amber-soft:#2B2314;
+  --red:#E79A92;
+  --red-soft:#2C1D1B;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 24px -12px rgba(0,0,0,.65);
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --read:17px;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0E1218; --surface:#151A22; --surface-2:#1C232D;
-  --ink:#E7EAF0; --ink-2:#C3CAD6; --muted:#939DAC; --faint:#6E7889;
-  --line:#252D39; --line-strong:#36404F;
-  --accent:#8DA8E8; --accent-ink:#0E1218; --accent-soft:#1A2334; --accent-line:#2E3C58;
-  --mark:#5C4A12; --mark-ink:#FFE9A8;
-  --amber:#D9A84A; --amber-soft:#2A2214;
-  --red:#E08585; --red-soft:#2C1A1A;
-  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  --bg:#16130F;
+  --surface:#1E1A15;
+  --surface-2:#272119;
+  --ink:#F0EBE3;
+  --ink-2:#D0C8BC;
+  --muted:#9D9386;
+  --faint:#776E63;
+  --line:#2F2921;
+  --line-strong:#443B30;
+  --accent:#E79A92;
+  --accent-ink:#16130F;
+  --accent-soft:#2C1D1B;
+  --accent-line:#4D302C;
+  --mark:#5C4A12;
+  --mark-ink:#FBE7A6;
+  --amber:#D9A84A;
+  --amber-soft:#2B2314;
+  --red:#E79A92;
+  --red-soft:#2C1D1B;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 24px -12px rgba(0,0,0,.65);
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --read:17px;
 }
 
 *{box-sizing:border-box}
@@ -47,8 +93,9 @@ a{color:var(--accent)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
 ::selection{background:var(--accent-soft);color:var(--ink)}
 
-.app{display:grid;grid-template-columns:308px minmax(0,1fr);min-height:100vh}
-@media(max-width:1000px){.app{grid-template-columns:1fr}}
+.app{display:grid;grid-template-columns:308px minmax(0,1fr);min-height:100vh;
+  container-type:inline-size;container-name:app;transition:max-width .25s ease}
+@container app (max-width:1000px){.app{grid-template-columns:1fr}}
 
 /* ---------- barra ---------- */
 .bar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;
@@ -62,11 +109,19 @@ a{color:var(--accent)}
   background:var(--surface-2);border:1px solid var(--line);border-radius:8px;color:var(--muted);font-size:13px}
 .searchbtn:hover{border-color:var(--line-strong)}
 .searchbtn kbd{margin-left:auto;font-family:var(--mono);font-size:11px;padding:1px 5px;border:1px solid var(--line-strong);border-radius:4px}
-@media(max-width:700px){.searchbtn{min-width:0}.searchbtn span,.searchbtn kbd{display:none}}
+@container app (max-width:700px){
+  /* el buscador se reduce a un botón redondo, igual que los demás */
+  .searchbtn{min-width:0;width:34px;height:34px;padding:0;justify-content:center;border-radius:50%}
+  .searchbtn span,.searchbtn kbd{display:none}
+  .bar-id{display:none}
+  .bar{gap:8px;padding:10px 14px}
+}
+/* dentro de un teléfono de verdad el botón de vista no tiene sentido */
+@container app (max-width:1000px){#movil{display:none}}
 .iconbtn{width:34px;height:34px;display:grid;place-items:center;border-radius:8px;border:1px solid transparent;color:var(--ink-2);flex:none}
 .iconbtn:hover{background:var(--surface-2);border-color:var(--line)}
 .menubtn{display:none}
-@media(max-width:1000px){.menubtn{display:grid}}
+@container app (max-width:1000px){.menubtn{display:grid}}
 
 /* ---------- índice lateral ---------- */
 .side{grid-row:1/3;border-right:1px solid var(--line);background:var(--surface);
@@ -98,20 +153,20 @@ a{color:var(--accent)}
 .chip:hover{border-color:var(--accent-line);color:var(--accent);background:var(--accent-soft)}
 .chip[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .chip.has-note{border-color:var(--amber)}
-@media(max-width:1000px){
+@container app (max-width:1000px){
   .side{position:fixed;inset:0 auto 0 0;width:min(330px,88vw);transform:translateX(-102%);
     transition:transform .22s ease;box-shadow:var(--shadow)}
   .side[data-open="true"]{transform:none}
   .scrim{position:fixed;inset:0;background:rgba(8,10,14,.45);z-index:45;opacity:0;pointer-events:none;transition:opacity .2s}
   .scrim[data-open="true"]{opacity:1;pointer-events:auto}
 }
-@media(min-width:1001px){.scrim{display:none}}
+@container app (min-width:1001px){.scrim{display:none}}
 
 /* ---------- columna de lectura ---------- */
 .main{min-width:0}
 .wrap{max-width:1200px;margin:0 auto;padding:26px 24px 120px;
   display:grid;grid-template-columns:minmax(0,1fr) 236px;gap:40px}
-@media(max-width:1240px){.wrap{grid-template-columns:minmax(0,1fr);max-width:780px}}
+@container app (max-width:1240px){.wrap{grid-template-columns:minmax(0,1fr);max-width:780px}}
 
 .masthead{margin-bottom:30px;padding-bottom:22px;border-bottom:1px solid var(--line)}
 .masthead h1{font-family:var(--serif);font-size:clamp(30px,4.4vw,42px);font-weight:600;
@@ -170,7 +225,7 @@ article.art:hover .art-tools,article.art:focus-within .art-tools{opacity:1}
 /* ---------- riel derecho ---------- */
 .rail{position:sticky;top:78px;align-self:start;display:flex;flex-direction:column;gap:24px;
   max-height:calc(100vh - 104px);overflow-y:auto;padding-bottom:20px}
-@media(max-width:1240px){.rail{position:static;max-height:none;border-top:1px solid var(--line);padding-top:28px;margin-top:40px}}
+@container app (max-width:1240px){.rail{position:static;max-height:none;border-top:1px solid var(--line);padding-top:28px;margin-top:40px}}
 .rail h3{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;
   color:var(--faint);margin:0 0 10px;font-weight:500}
 .toc a{display:block;font-size:12px;padding:4px 0 4px 11px;border-left:2px solid var(--line);
@@ -224,6 +279,21 @@ article.art:hover .art-tools,article.art:focus-within .art-tools{opacity:1}
   border-radius:20px;background:var(--surface);font-variant-numeric:tabular-nums}
 .aviso .enlaces{display:flex;flex-wrap:wrap;gap:16px;font-size:12px;padding-top:12px;border-top:1px solid var(--line)}
 
+/* ---------- vista de teléfono ---------- */
+:root[data-vista="movil"] .app{max-width:420px;margin:0 auto;
+  box-shadow:0 0 0 1px var(--line-strong), 0 24px 60px -20px var(--nu-bajo)}
+:root[data-vista="movil"] body{background:var(--surface-2)}
+:root[data-vista="movil"] .marco{display:flex}
+:root[data-vista="movil"] .side{left:calc(50% - 210px);right:auto}
+:root[data-vista="movil"] .scrim{left:calc(50% - 210px);width:420px;right:auto}
+.marco{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:55;
+  align-items:center;gap:9px;padding:8px 14px;border-radius:22px;
+  background:var(--nu-bg);color:var(--muted);font-size:12px;
+  box-shadow:4px 4px 12px var(--nu-bajo), -4px -4px 12px var(--nu-alto)}
+.marco b{color:var(--ink);font-weight:500}
+.marco button{color:var(--accent);font-size:12px;font-weight:500}
+@container app (max-width:1000px){:root[data-vista="movil"] .marco{display:none}}
+
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media print{
   .side,.bar,.rail,.art-tools,.scrim,.ovl,.toast{display:none!important}
@@ -232,6 +302,86 @@ article.art:hover .art-tools,article.art:focus-within .art-tools{opacity:1}
   body{background:#fff;color:#000}
   article.art{break-inside:avoid;content-visibility:visible}
 }
+
+/* ================= relieve suave (neumorfismo aplicado con criterio) =================
+   El relieve va en los CONTROLES. El texto de la ley se queda plano y con
+   contraste alto: 562 artículos no se leen sobre superficies de bajo contraste. */
+:root{
+  --nu-bg:#EBE6DE;            /* el fondo y las piezas comparten color: eso crea el relieve */
+  --nu-alto:rgba(255,255,255,.92);
+  --nu-bajo:rgba(163,150,132,.42);
+  --nu-r:12px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --nu-bg:#1B1712; --nu-alto:rgba(255,255,255,.045); --nu-bajo:rgba(0,0,0,.55);
+  }
+}
+:root[data-theme="dark"]{
+  --nu-bg:#1B1712; --nu-alto:rgba(255,255,255,.045); --nu-bajo:rgba(0,0,0,.55);
+}
+
+body{background:var(--nu-bg)}
+.side{background:var(--nu-bg);border-right:none;
+  box-shadow:6px 0 16px -10px var(--nu-bajo)}
+.side-head{border-bottom:none}
+.bar{background:color-mix(in srgb,var(--nu-bg) 90%,transparent);border-bottom:none;
+  box-shadow:0 6px 14px -12px var(--nu-bajo)}
+
+/* hundidos: campos donde se escribe */
+.filter,.notebox textarea,.panel-in input{
+  background:var(--nu-bg);border:none;border-radius:var(--nu-r);
+  box-shadow:inset 3px 3px 7px var(--nu-bajo), inset -3px -3px 7px var(--nu-alto)}
+.filter:focus,.notebox textarea:focus{outline:none;
+  box-shadow:inset 3px 3px 7px var(--nu-bajo), inset -3px -3px 7px var(--nu-alto),
+             0 0 0 2px var(--accent-line)}
+.notebox textarea{padding:12px 14px}
+
+/* elevados: cosas que se aprietan */
+.searchbtn,.iconbtn,.chip,.tool,.tag,.num,.railcard,.res,.panel{
+  background:var(--nu-bg);border:none;border-radius:var(--nu-r);
+  box-shadow:3px 3px 7px var(--nu-bajo), -3px -3px 7px var(--nu-alto)}
+.searchbtn{padding:9px 14px}
+.searchbtn:hover,.iconbtn:hover,.chip:hover,.tool:hover{
+  box-shadow:4px 4px 9px var(--nu-bajo), -4px -4px 9px var(--nu-alto)}
+.searchbtn:active,.iconbtn:active,.chip:active,.tool:active{
+  box-shadow:inset 3px 3px 6px var(--nu-bajo), inset -3px -3px 6px var(--nu-alto)}
+.searchbtn kbd,.esc{border:none;background:var(--nu-bg);
+  box-shadow:inset 1px 1px 3px var(--nu-bajo), inset -1px -1px 3px var(--nu-alto)}
+.iconbtn{border-radius:50%}
+.chip{border-radius:9px;padding:4px 8px}
+.tool{border-radius:9px;padding:5px 11px}
+.tag,.num{border-radius:20px}
+.num{border-radius:9px}
+.railcard{border-radius:14px;padding:14px 16px}
+.panel{border-radius:18px;
+  box-shadow:10px 10px 30px var(--nu-bajo), -6px -6px 20px var(--nu-alto)}
+.panel-in{border-bottom:none}
+.panel-foot{border-top:none}
+.res{box-shadow:none;background:none}
+.res[data-sel="true"]{background:var(--nu-bg);
+  box-shadow:inset 2px 2px 5px var(--nu-bajo), inset -2px -2px 5px var(--nu-alto)}
+
+/* estados marcados: hundidos, no rellenos de color */
+.chip[aria-current="true"]{background:var(--nu-bg);color:var(--accent);
+  box-shadow:inset 2px 2px 5px var(--nu-bajo), inset -2px -2px 5px var(--nu-alto)}
+.chip.has-note{color:var(--amber)}
+.tool[aria-pressed="true"]{background:var(--nu-bg);color:var(--amber);
+  box-shadow:inset 2px 2px 5px var(--nu-bajo), inset -2px -2px 5px var(--nu-alto)}
+.tw-btn:hover{background:none;
+  box-shadow:inset 2px 2px 5px var(--nu-bajo), inset -2px -2px 5px var(--nu-alto);border-radius:9px}
+.tw-kids{border-left:none;margin-left:14px;padding-left:6px}
+
+/* la columna de lectura: una hoja limpia, sin relieve y con contraste pleno */
+.wrap{padding-top:34px}
+main#doc{background:var(--surface);border-radius:20px;padding:34px 38px 42px;
+  box-shadow:5px 5px 16px var(--nu-bajo), -5px -5px 16px var(--nu-alto)}
+@container app (max-width:640px){main#doc{padding:22px 20px 30px;border-radius:16px}}
+article.art{border-bottom:1px solid var(--line)}
+.h-libro{border-top:2px solid var(--accent);border-bottom:none}
+.masthead{border-bottom:1px solid var(--line)}
+.toc a{border-left:2px solid var(--line)}
+.aviso{border-top:2px solid var(--line-strong)}
 </style>
 
 <div class="app">
@@ -269,6 +419,9 @@ article.art:hover .art-tools,article.art:focus-within .art-tools{opacity:1}
       </button>
       <button class="iconbtn" id="bigger" aria-label="Cambiar el tamaño del texto" title="Tamaño del texto">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19 9.5 5l5.5 14M6 14h7"/><path d="M17 12h5M19.5 9.5v5"/></svg>
+      </button>
+      <button class="iconbtn" id="movil" aria-label="Ver como en un teléfono" aria-pressed="false" title="Vista de teléfono">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>
       </button>
       <button class="iconbtn" id="theme" aria-label="Cambiar entre claro y oscuro" title="Tema">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
@@ -336,6 +489,12 @@ article.art:hover .art-tools,article.art:focus-within .art-tools{opacity:1}
   </div>
 </div>
 
+<div class="marco" id="marco">
+  <b>Vista de teléfono</b>
+  <span>420 px de ancho</span>
+  <button id="salirMovil">Salir</button>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="datos/cpp.js"></script>
@@ -373,6 +532,21 @@ $('#bigger').addEventListener('click', () => {
   toast('Texto en ' + sizes[sizeIdx]);
 });
 $('#print').addEventListener('click', () => window.print());
+
+/* ---------- vista de teléfono ----------
+   No simula un dispositivo: estrecha el lector de verdad. Como la maqueta
+   ahora responde al ancho del contenedor y no al de la ventana, el sitio
+   entra en su modo compacto real, con el índice como cajón lateral. */
+const btnMovil = $('#movil');
+function vistaMovil(activa){
+  if (activa) root.setAttribute('data-vista', 'movil');
+  else root.removeAttribute('data-vista');
+  btnMovil.setAttribute('aria-pressed', activa);
+  store.write('cpp.vista', activa ? 'movil' : '');
+  closeSide();
+}
+btnMovil.addEventListener('click', () => vistaMovil(root.getAttribute('data-vista') !== 'movil'));
+$('#salirMovil').addEventListener('click', () => vistaMovil(false));
 
 /* ---------- cabecera ---------- */
 const fecha = f => { const [y,m,d] = (f||'').split('-'); return d ? `${d}-${m}-${y}` : (f||'—'); };
@@ -700,6 +874,7 @@ function toast(msg){
   clearTimeout(tTimer); tTimer = setTimeout(() => t.dataset.open = 'false', 1800);
 }
 
+vistaMovil(store.read('cpp.vista', '') === 'movil');
 renderTree(''); renderDoc(); renderToc(0); renderResults(''); spy();
 if (location.hash) setTimeout(() => goto(location.hash.slice(1), false), 80);
 </script>
