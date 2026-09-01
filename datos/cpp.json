@@ -6,6 +6,7 @@
  "promulgacion": "2000-09-29",
  "publicacion": "2000-10-12",
  "ultimaVersion": "2026-07-22",
+ "versionInferida": false,
  "fuente": "https://www.bcn.cl/leychile/navegar?idNorma=176595",
  "estructura": [
   {
@@ -10754,6 +10755,17 @@
     "Libro Cuarto",
     "Título Final"
    ]
+  },
+  {
+   "n": "transitorio",
+   "ord": 1000001.0,
+   "epi": "Reglas para la aplicación de las penas por tribunales con competencia en lo criminal sujetos a distintos procedimientos",
+   "p": [
+    "Si una persona hubiere cometido distintos hechos, debido a los cuales fuere juzgada por un juzgado de letras del crimen o con competencia en lo criminal, con sujeción al Código de Procedimiento Penal, y también lo fuere por un juzgado de garantía o un tribunal oral en lo penal conforme a este Código, en el pronunciamiento de las sentencias condenatorias que se dictaren con posterioridad a la primera se estará a lo previsto en el artículo 164 del Código Orgánico de Tribunales.''."
+   ],
+   "derogado": false,
+   "desde": "2000-10-12",
+   "ruta": []
   }
  ]
 }
