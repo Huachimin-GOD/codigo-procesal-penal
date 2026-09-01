@@ -1,0 +1,17 @@
+name: Radiografia
+
+# Diagnostico: cuenta cuantos articulos hay en el XML y cuantos reconoce el
+# parser, para entender por que se pierden. No publica nada.
+on:
+  workflow_dispatch:
+
+jobs:
+  radiografia:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Radiografiar las normas problematicas
+        run: python3 radiografia.py >> $GITHUB_STEP_SUMMARY
