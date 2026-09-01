@@ -1,3 +1,6 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Los 562 artículos del Código Procesal Penal de Chile (Ley 19.696), con buscador instantáneo, generados desde el XML oficial de Ley Chile. Sitio no oficial.">
@@ -105,6 +108,11 @@
   --read:17px;
 }
 
+.salto{position:absolute;left:-9999px;top:0;z-index:100;padding:12px 18px;
+  background:var(--accent);color:var(--accent-ink);border-radius:0 0 10px 0;
+  font-size:14px;font-weight:500;text-decoration:none}
+.salto:focus{left:0}
+
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
@@ -127,6 +135,7 @@ a{color:var(--accent)}
 .searchbtn{display:flex;align-items:center;gap:10px;padding:7px 12px;min-width:240px;
   background:var(--surface-2);border:1px solid var(--line);border-radius:8px;color:var(--muted);font-size:13px}
 .searchbtn:hover{border-color:var(--line-strong)}
+.searchbtn svg{color:var(--ink-2)}
 .searchbtn kbd{margin-left:auto;font-family:var(--mono);font-size:11px;padding:1px 5px;border:1px solid var(--line-strong);border-radius:4px}
 @container app (max-width:700px){
   /* el buscador se reduce a un botón redondo, igual que los demás */
@@ -223,16 +232,19 @@ article.art[data-hot="true"] .num{background:var(--accent);color:var(--accent-in
 .art-body p{font-family:var(--serif);font-size:var(--read);line-height:1.68;color:var(--ink-2);
   margin:0 0 .8em;max-width:68ch;text-align:justify;hyphens:auto}
 .art-body p:last-child{margin-bottom:0}
+/* Justificar solo cuando la columna da el ancho: en el teléfono abre ríos
+   blancos entre palabras. Va después de la regla base para ganarle por orden. */
+@container app (max-width:760px){
+  .art-body p{text-align:left;hyphens:none}
+}
 .xref{color:var(--accent);text-decoration:underline;text-decoration-color:var(--accent-line);
   text-underline-offset:2px;cursor:pointer}
 mark{background:var(--mark);color:var(--mark-ink);border-radius:2px;padding:0 1px}
 
-.art-tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;opacity:.4;transition:opacity .15s}
-article.art:hover .art-tools,article.art:focus-within .art-tools{opacity:1}
-@media(hover:none){.art-tools{opacity:1}}
+.art-tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}
 .tool{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:4px 9px;
-  border:1px solid var(--line);border-radius:6px;color:var(--muted);text-decoration:none}
-.tool:hover{border-color:var(--line-strong);color:var(--ink)}
+  border:1px solid var(--line);border-radius:6px;color:var(--ink-2);text-decoration:none}
+.tool:hover{border-color:var(--line-strong);color:var(--accent)}
 .tool[aria-pressed="true"]{background:var(--amber-soft);border-color:color-mix(in srgb,var(--amber) 40%,transparent);color:var(--amber)}
 
 .notebox{margin-top:12px;display:none}
@@ -402,7 +414,9 @@ article.art{border-bottom:1px solid var(--line)}
 .toc a{border-left:2px solid var(--line)}
 .aviso{border-top:2px solid var(--line-strong)}
 </style>
-
+</head>
+<body>
+<a class="salto" href="#doc">Saltar al articulado</a>
 <div class="app">
   <aside class="side" id="side">
     <div class="side-head">
@@ -422,7 +436,7 @@ article.art{border-bottom:1px solid var(--line)}
   <div class="scrim" id="scrim"></div>
 
   <div class="main">
-    <header class="bar">
+    <header class="bar" role="toolbar" aria-label="Herramientas de lectura">
       <button class="iconbtn menubtn" id="menu" aria-label="Abrir el índice">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
@@ -514,7 +528,7 @@ article.art{border-bottom:1px solid var(--line)}
   <button id="salirMovil">Salir</button>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <!-- Estadísticas sin cookies ni seguimiento de personas. Panel: https://leyesacademicocl.goatcounter.com -->
 <script data-goatcounter="https://leyesacademicocl.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
@@ -924,3 +938,5 @@ vistaMovil(store.read('cpp.vista', '') === 'movil');
 renderTree(''); renderDoc(); renderToc(0); renderResults(''); spy();
 if (location.hash) setTimeout(() => goto(location.hash.slice(1), false), 80);
 </script>
+</body>
+</html>
