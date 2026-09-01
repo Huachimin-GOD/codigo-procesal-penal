@@ -82,6 +82,36 @@ jobs:
               if len(nums) != len(set(nums)):
                   repes = sorted({n for n in nums if nums.count(n) > 1})[:5]
                   problemas.append(f"{c['slug']}: articulos repetidos {repes}")
+              # Cada articulo tiene que aparecer una sola vez en el indice, y
+              # los propios de una rama deben ir antes que los de sus hijas: si
+              # no, se dibujan dos veces o en desorden. El 25 y el 26 del Codigo
+              # Penal estaban en los datos y no salian en pantalla.
+              orden = {a["n"]: a["ord"] for a in arts}
+              en_indice, entrelazadas = [], []
+
+              def revisar(ramas):
+                  for r in ramas:
+                      en_indice.extend(r["arts"])
+                      hijas = []
+
+                      def juntar(hs):
+                          for h in hs:
+                              hijas.extend(h["arts"])
+                              juntar(h["hijos"])
+
+                      juntar(r["hijos"])
+                      if r["arts"] and hijas and \
+                         max(orden[x] for x in r["arts"]) > min(orden[x] for x in hijas):
+                          entrelazadas.append(f"{r['tipo']} {r['num']}".strip())
+                      revisar(r["hijos"])
+
+              revisar(d["estructura"])
+              if len(en_indice) != len(set(en_indice)):
+                  dobles = sorted({x for x in en_indice if en_indice.count(x) > 1})[:5]
+                  problemas.append(f"{c['slug']}: articulos en dos ramas del indice {dobles}")
+              if entrelazadas:
+                  problemas.append(f"{c['slug']}: ramas con articulos fuera de orden {entrelazadas[:3]}")
+
               pagina = SITIO / c["carpeta"] / "index.html"
               if not pagina.exists():
                   problemas.append(f"{c['slug']}: no se genero la pagina")
