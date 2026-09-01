@@ -54,7 +54,7 @@ def descargar(id_norma, fecha=None, intentos=4, espera=30):
         url += f"&fechaVersion={fecha}"
     # Un agente identificable y con contacto: si molestamos, que sepan a quién escribir.
     req = urllib.request.Request(url, headers={
-        "User-Agent": "ingesta-leyes/2.0 (+https://github.com/Huachimin-GOD/codigo-procesal-penal)",
+        "User-Agent": "ingesta-leyes/2.0 (+https://github.com/australcode-1/codigo-procesal-penal)",
         "Accept": "application/xml",
     })
 
