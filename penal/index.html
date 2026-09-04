@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Los 677 artículos del Código Penal de Chile (Código PENAL), con buscador instantáneo, generados desde el XML oficial de Ley Chile. Sitio no oficial.">
-<meta name="theme-color" content="#FAF8F4" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#16130F" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ECE4D0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)">
 <link rel="canonical" href="https://australcode-1.github.io/codigo-procesal-penal/penal/">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <link rel="manifest" href="manifest.webmanifest">
@@ -29,19 +29,19 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
 <style>
 :root{
-  --bg:#FAF8F4;
-  --surface:#FFFFFF;
-  --surface-2:#F2EDE5;
-  --ink:#1C1814;
-  --ink-2:#453F38;
-  --muted:#746B61;
-  --faint:#A5998C;
-  --line:#E7E0D5;
-  --line-strong:#D3C8B8;
-  --accent:#8E2B2B;
-  --accent-ink:#FFFFFF;
-  --accent-soft:#F8EAE6;
-  --accent-line:#E2C0B8;
+  --bg:#ECE4D0;
+  --surface:#F6F1E4;
+  --surface-2:#E3DAC3;
+  --ink:#141414;
+  --ink-2:#3B3630;
+  --muted:#635C50;
+  --faint:#8B8272;
+  --line:#DBD1B9;
+  --line-strong:#C3B79B;
+  --accent:#B8390D;
+  --accent-ink:#FFF6EC;
+  --accent-soft:#F7E3D6;
+  --accent-line:#E3B79F;
   --mark:#FBE7A6;
   --mark-ink:#4A3A00;
   --amber:#8A5A00;
@@ -56,19 +56,19 @@
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-  --bg:#16130F;
-  --surface:#1E1A15;
-  --surface-2:#272119;
-  --ink:#F0EBE3;
-  --ink-2:#D0C8BC;
-  --muted:#9D9386;
-  --faint:#776E63;
-  --line:#2F2921;
-  --line-strong:#443B30;
-  --accent:#E79A92;
-  --accent-ink:#16130F;
-  --accent-soft:#2C1D1B;
-  --accent-line:#4D302C;
+  --bg:#141414;
+  --surface:#1B1B1A;
+  --surface-2:#242320;
+  --ink:#ECE4D0;
+  --ink-2:#CFC7B2;
+  --muted:#9A9184;
+  --faint:#7A7365;
+  --line:#2A2724;
+  --line-strong:#3C3833;
+  --accent:#F55B2B;
+  --accent-ink:#141414;
+  --accent-soft:#2C1710;
+  --accent-line:#5C2C17;
   --mark:#5C4A12;
   --mark-ink:#FBE7A6;
   --amber:#D9A84A;
@@ -83,19 +83,19 @@
   }
 }
 :root[data-theme="dark"]{
-  --bg:#16130F;
-  --surface:#1E1A15;
-  --surface-2:#272119;
-  --ink:#F0EBE3;
-  --ink-2:#D0C8BC;
-  --muted:#9D9386;
-  --faint:#776E63;
-  --line:#2F2921;
-  --line-strong:#443B30;
-  --accent:#E79A92;
-  --accent-ink:#16130F;
-  --accent-soft:#2C1D1B;
-  --accent-line:#4D302C;
+  --bg:#141414;
+  --surface:#1B1B1A;
+  --surface-2:#242320;
+  --ink:#ECE4D0;
+  --ink-2:#CFC7B2;
+  --muted:#9A9184;
+  --faint:#7A7365;
+  --line:#2A2724;
+  --line-strong:#3C3833;
+  --accent:#F55B2B;
+  --accent-ink:#141414;
+  --accent-soft:#2C1710;
+  --accent-line:#5C2C17;
   --mark:#5C4A12;
   --mark-ink:#FBE7A6;
   --amber:#D9A84A;
@@ -363,18 +363,18 @@ mark{background:var(--mark);color:var(--mark-ink);border-radius:2px;padding:0 1p
    El relieve va en los CONTROLES. El texto de la ley se queda plano y con
    contraste alto: cientos de artículos no se leen sobre superficies de bajo contraste. */
 :root{
-  --nu-bg:#EBE6DE;            /* el fondo y las piezas comparten color: eso crea el relieve */
-  --nu-alto:rgba(255,255,255,.92);
-  --nu-bajo:rgba(163,150,132,.42);
+  --nu-bg:#E7DEC7;            /* el fondo y las piezas comparten color: eso crea el relieve */
+  --nu-alto:rgba(255,255,255,.80);
+  --nu-bajo:rgba(138,122,88,.40);
   --nu-r:12px;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --nu-bg:#1B1712; --nu-alto:rgba(255,255,255,.045); --nu-bajo:rgba(0,0,0,.55);
+    --nu-bg:#171717; --nu-alto:rgba(255,255,255,.04); --nu-bajo:rgba(0,0,0,.60);
   }
 }
 :root[data-theme="dark"]{
-  --nu-bg:#1B1712; --nu-alto:rgba(255,255,255,.045); --nu-bajo:rgba(0,0,0,.55);
+  --nu-bg:#171717; --nu-alto:rgba(255,255,255,.04); --nu-bajo:rgba(0,0,0,.60);
 }
 
 body{background:var(--nu-bg)}
@@ -438,6 +438,26 @@ article.art{border-bottom:1px solid var(--line)}
 .masthead{border-bottom:1px solid var(--line)}
 .toc a{border-left:2px solid var(--line)}
 .aviso{border-top:2px solid var(--line-strong)}
+
+/* ---------- panel oscuro: barra e índice ---------- */
+.bar,.side{
+  --surface:#141414;
+  --surface-2:#232220;
+  --nu-bg:#141414;
+  --ink:#ECE4D0;
+  --ink-2:#CFC7B2;
+  --muted:#9A9184;
+  --faint:#7A7365;
+  --line:#2A2724;
+  --line-strong:#3C3833;
+  --accent:#F55B2B;
+  --accent-ink:#141414;
+  --accent-soft:#2C1710;
+  --accent-line:#5C2C17;
+  color:var(--ink);
+}
+.side{box-shadow:none;border-right:1px solid #000}
+.bar{border-bottom:1px solid #000;box-shadow:none}
 </style>
 <script type="application/ld+json">
 {
@@ -490,7 +510,8 @@ article.art{border-bottom:1px solid var(--line)}
     <div class="side-head">
       <div class="crest">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 3v18M6 21h12M3 8l4-3 4 3M3 8l2 4h4l2-4M13 8l4-3 4 3M13 8l2 4h4l2-4"/>
+          <path d="M12 6.5C10.5 5 8.5 4.3 6 4.3H3v13.4h3c2.5 0 4.5.7 6 2.2 1.5-1.5 3.5-2.2 6-2.2h3V4.3h-3c-2.5 0-4.5.7-6 2.2Z"/>
+          <path d="M12 6.5v13.4"/>
         </svg>
         <div>
           <b>Código<br>Penal</b>
