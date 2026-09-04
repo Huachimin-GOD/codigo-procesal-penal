@@ -1,0 +1,168 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Los códigos de Chile en un lector rápido, con buscador instantáneo y sin conexión, generados desde el XML oficial de Ley Chile (BCN). Sitio no oficial.">
+<meta name="theme-color" content="#ECE4D0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="{{BASE}}">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="iconos/icono-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="iconos/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Códigos Chile">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_CL">
+<meta property="og:site_name" content="Códigos de Chile">
+<meta property="og:title" content="Códigos de Chile">
+<meta property="og:description" content="{{N_CODIGOS}} códigos con buscador instantáneo, desde el XML oficial de la Biblioteca del Congreso Nacional. Sitio no oficial.">
+<meta property="og:url" content="{{BASE}}">
+<meta property="og:image" content="{{BASE}}iconos/compartir.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<title>Códigos de Chile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
+<style>
+:root{
+  --bg:#ECE4D0;
+  --surface:#F6F1E4;
+  --surface-2:#E3DAC3;
+  --ink:#141414;
+  --ink-2:#3B3630;
+  --muted:#635C50;
+  --faint:#8B8272;
+  --line:#DBD1B9;
+  --line-strong:#C3B79B;
+  --accent:#B8390D;
+  --vivo:#F55B2B;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+  --bg:#141414;
+  --surface:#1B1B1A;
+  --surface-2:#242320;
+  --ink:#ECE4D0;
+  --ink-2:#CFC7B2;
+  --muted:#9A9184;
+  --faint:#7A7365;
+  --line:#2A2724;
+  --line-strong:#3C3833;
+  --accent:#F55B2B;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.salto{position:absolute;left:-9999px;top:0;z-index:100;padding:12px 18px;
+  background:var(--accent);color:#FFF6EC;border-radius:0 0 10px 0}
+.salto:focus{left:0}
+.env{max-width:940px;margin:0 auto;padding:0 22px}
+
+/* ---------- cabecera oscura, como el bloque de identidad ---------- */
+.hero{background:#141414;color:#ECE4D0;padding:46px 0 52px;border-bottom:1px solid #000}
+.marca{display:flex;align-items:center;gap:11px;margin-bottom:34px}
+.marca svg{flex:none;stroke:var(--vivo);fill:none;stroke-width:1.5;
+  stroke-linecap:round;stroke-linejoin:round}
+.marca b{font-family:var(--mono);font-size:11.5px;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--vivo)}
+.hero h1{font-family:var(--serif);font-size:clamp(38px,7vw,62px);font-weight:700;
+  letter-spacing:-.025em;line-height:1.04;margin:0 0 16px;max-width:16ch}
+.hero p{margin:0;max-width:56ch;color:#CFC7B2;font-size:17px}
+.cifras{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:30px;
+  font-family:var(--mono);font-size:12px;color:#9A9184}
+.cifras b{color:#ECE4D0;font-weight:500}
+
+/* ---------- la lista de códigos ---------- */
+h2{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);margin:52px 0 16px}
+.rejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.cod{display:block;background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;padding:20px 20px 17px;text-decoration:none;color:inherit;
+  transition:border-color .15s, transform .15s}
+.cod:hover{border-color:var(--accent);transform:translateY(-2px)}
+.cod b{display:block;font-family:var(--serif);font-size:21px;font-weight:600;
+  letter-spacing:-.015em;line-height:1.2;margin-bottom:9px}
+.cod .ley{font-family:var(--mono);font-size:11.5px;color:var(--accent)}
+.cod .datos{margin-top:13px;padding-top:12px;border-top:1px solid var(--line);
+  font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 14px}
+.cod .datos span{white-space:nowrap}
+
+/* ---------- explicación y pie ---------- */
+.nota{margin:56px 0 0;padding:24px 26px;background:var(--surface-2);
+  border-radius:14px;font-size:14.5px;color:var(--ink-2);max-width:70ch}
+.nota p{margin:0 0 12px}
+.nota p:last-child{margin:0}
+.nota strong{color:var(--ink)}
+footer{margin-top:44px;padding:26px 0 54px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 20px}
+</style>
+
+<a class="salto" href="#codigos">Saltar a la lista de códigos</a>
+
+<header class="hero">
+  <div class="env">
+    <div class="marca">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 6.5C10.5 5 8.5 4.3 6 4.3H3v13.4h3c2.5 0 4.5.7 6 2.2 1.5-1.5 3.5-2.2 6-2.2h3V4.3h-3c-2.5 0-4.5.7-6 2.2Z"/>
+        <path d="M12 6.5v13.4"/>
+      </svg>
+      <b>Códigos de Chile</b>
+    </div>
+    <h1>El texto oficial, legible.</h1>
+    <p>Los códigos de la República, con buscador instantáneo, índice navegable y
+       lectura sin conexión. Cada uno se genera desde el XML oficial de Ley Chile
+       y se revisa todos los días.</p>
+    <div class="cifras">
+      <span><b>{{N_CODIGOS}}</b> códigos</span>
+      <span><b>{{N_ARTICULOS}}</b> artículos</span>
+      <span>revisado el <b>{{REVISADO}}</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="env">
+  <h2 id="codigos">Códigos disponibles</h2>
+  <div class="rejilla">
+{{TARJETAS}}
+  </div>
+
+  <div class="nota">
+    <p><strong>Esto no es un sitio oficial.</strong> El texto viene del XML que
+       publica la Biblioteca del Congreso Nacional en
+       <a href="https://www.bcn.cl/leychile">Ley Chile</a>, y se reproduce tal
+       cual, sin resumir ni interpretar. Para citar en un escrito, consulta
+       siempre la versión oficial.</p>
+    <p>Cada madrugada un robot vuelve a pedirle a la BCN cada código. Si cambió,
+       la página se rehace sola; si la descarga viene incompleta o con un dato
+       imposible, no se publica nada y queda la versión anterior.</p>
+  </div>
+
+  <footer>
+    <span>Generado desde el XML oficial de Ley Chile (BCN)</span>
+    <span>Sitio no oficial, sin fines de lucro</span>
+    <a href="https://github.com/australcode-1/codigo-procesal-penal">Código fuente</a>
+  </footer>
+</main>
+
+<script>
+/* Los enlaces viejos apuntaban aquí: durante meses la raíz del sitio fue el
+   Código Procesal Penal, y hay direcciones guardadas y compartidas con el
+   artículo en el ancla. En vez de dejarlas caer en la portada, se reenvían a
+   su nueva dirección conservando el ancla y la búsqueda. */
+(() => {
+  const params = new URLSearchParams(location.search);
+  const ancla = location.hash;
+  if (!ancla && !params.has('q')) return;
+  const destino = 'procesal-penal/' + (params.has('q') ? '?q=' + encodeURIComponent(params.get('q')) : '') + ancla;
+  location.replace(destino);
+})();
+if ('serviceWorker' in navigator && location.protocol !== 'file:'){
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
