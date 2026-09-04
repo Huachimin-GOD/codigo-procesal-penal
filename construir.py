@@ -18,6 +18,7 @@ así los metadatos de la página no pueden quedar desfasados del contenido.
 import json
 import pathlib
 import sys
+import time
 
 from codigos import CODIGOS, SITIO, hacia_raiz, ruta_datos
 
@@ -114,13 +115,89 @@ def ficha(codigo, info, base):
     return f'<script type="application/ld+json">\n{texto}\n</script>\n'
 
 
+def portada(construidos):
+    """La página de entrada: qué códigos hay y qué es esto.
+
+    Las tarjetas se escriben en el HTML, no se dibujan con JavaScript: es la
+    página que tiene que entender un buscador, y lo que no está en el HTML
+    llega tarde o no llega.
+    """
+    tarjetas, total = [], 0
+    for codigo, info in construidos:
+        destino = f"{codigo['carpeta']}/" if codigo["carpeta"] else "./"
+        total += info["articulos"]
+        tarjetas.append(
+            f'    <a class="cod" href="{destino}">\n'
+            f'      <b>{codigo["nombre"]}</b>\n'
+            f'      <span class="ley">{info["ley"]}</span>\n'
+            f'      <span class="datos"><span>{info["articulos"]} artículos</span>'
+            f'<span>{info["etiqueta"]} {fecha_es(info["fecha"])}</span></span>\n'
+            f'    </a>')
+
+    hoy = time.strftime("%d-%m-%Y", time.gmtime())
+    documento = (RAIZ / "portada.html").read_text(encoding="utf-8")
+    for marca, valor in {
+        "{{TARJETAS}}": "\n".join(tarjetas),
+        "{{N_CODIGOS}}": str(len(construidos)),
+        "{{N_ARTICULOS}}": f"{total:,}".replace(",", "."),
+        "{{REVISADO}}": hoy,
+        "{{BASE}}": BASE_PUBLICA,
+    }.items():
+        documento = documento.replace(marca, valor)
+
+    if "{{" in documento:
+        sys.exit("quedó un marcador sin rellenar en la portada: "
+                 + documento[documento.index("{{"):][:40])
+
+    documento = ("<!doctype html>\n"
+                 '<html lang="es-CL">\n<head>\n'
+                 + documento[:documento.index("</style>") + len("</style>")].strip()
+                 + "\n</head>\n<body>\n"
+                 + documento[documento.index("</style>") + len("</style>"):].strip()
+                 + "\n</body>\n</html>\n")
+
+    (SITIO / "index.html").write_text(documento, encoding="utf-8")
+    (SITIO / "manifest.webmanifest").write_text(json.dumps({
+        "name": "Códigos de Chile", "short_name": "Códigos Chile",
+        "description": "Los códigos de Chile, desde el XML oficial de Ley Chile. Sitio no oficial.",
+        "lang": "es-CL", "dir": "ltr", "start_url": ".", "scope": ".",
+        "display": "standalone", "background_color": "#ECE4D0", "theme_color": "#ECE4D0",
+        "categories": ["books", "education", "reference"],
+        "icons": [
+            {"src": "iconos/icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+            {"src": "iconos/icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+            {"src": "iconos/icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+        ],
+    }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (SITIO / "sw.js").write_text(
+        (RAIZ / "sw-plantilla.js").read_text(encoding="utf-8").replace("{{CACHE}}", "portada-v1"),
+        encoding="utf-8")
+
+    for necesario in ("<!doctype html>", 'lang="es-CL"', "<meta charset",
+                      'class="cod"', "procesal-penal/"):
+        if necesario not in documento:
+            sys.exit(f"FALTA en la portada: {necesario}")
+    return len(tarjetas), total
+
+
+def fecha_es(f):
+    """2026-07-22 → 22-07-2026, que es como se escribe una fecha en Chile."""
+    partes = (f or "").split("-")
+    return "-".join(reversed(partes)) if len(partes) == 3 else (f or "—")
+
+
 def indice_del_sitio(construidos):
     """robots.txt y sitemap.xml.
 
     El sitemap es la lista de las páginas con su fecha: es lo que se entrega
     en Search Console para que el buscador sepa qué hay y cuándo cambió.
     """
-    urls = []
+    hoy = time.strftime("%Y-%m-%d", time.gmtime())
+    urls = ["  <url>\n"
+            f"    <loc>{BASE_PUBLICA}</loc>\n"
+            f"    <lastmod>{hoy}</lastmod>\n"
+            "    <changefreq>weekly</changefreq>\n"
+            "  </url>"]
     for codigo, info in construidos:
         base = BASE_PUBLICA + (f"{codigo['carpeta']}/" if codigo["carpeta"] else "")
         urls.append("  <url>\n"
@@ -273,6 +350,8 @@ def main():
         info = datos_de(c)
         if info and (SITIO / c["carpeta"] / "index.html").exists():
             todos.append((c, info))
+    cuantos, articulos = portada(todos)
+    print(f"index.html · portada con {cuantos} códigos y {articulos} artículos")
     print(f"sitemap.xml con {indice_del_sitio(todos)} páginas · robots.txt")
     print("estructura verificada")
 
