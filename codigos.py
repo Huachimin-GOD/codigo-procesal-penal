@@ -11,8 +11,11 @@ leen de aquí. Agregar un código es agregar una línea.
   articulado  cuando la norma fija varios textos refundidos, cuál queremos
   carpeta     "" es la raíz del sitio; el resto son subcarpetas
 
-El Procesal Penal se queda en la raíz a propósito: su dirección ya está
-publicada y compartida, y moverla rompería los enlaces que existen.
+La raíz del sitio es la portada, no un código: con quince códigos, quien llega
+buscando el del Trabajo no puede aterrizar en el Procesal Penal. El Procesal
+Penal vivió en la raíz mientras fue el único, y hay enlaces compartidos que
+todavía apuntan ahí; por eso la portada reenvía a «procesal-penal/» cualquier
+dirección que traiga un ancla de artículo o una búsqueda.
 """
 import pathlib
 
@@ -30,7 +33,7 @@ CODIGOS = [
         "corto": "CPP Chile",
         "id": 176595,
         "articulado": None,
-        "carpeta": "",
+        "carpeta": "procesal-penal",
     },
     {
         "slug": "penal",
