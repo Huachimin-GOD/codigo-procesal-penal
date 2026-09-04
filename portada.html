@@ -22,7 +22,7 @@
 <title>Códigos de Chile</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@200;400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
 <style>
 :root{
   --bg:#ECE4D0;
@@ -36,6 +36,7 @@
   --line-strong:#C3B79B;
   --accent:#B8390D;
   --vivo:#F55B2B;
+  --oro:#C9A55B;
   --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -64,19 +65,42 @@ a{color:var(--accent)}
 .salto:focus{left:0}
 .env{max-width:940px;margin:0 auto;padding:0 22px}
 
-/* ---------- cabecera oscura, como el bloque de identidad ---------- */
-.hero{background:#141414;color:#ECE4D0;padding:46px 0 52px;border-bottom:1px solid #000}
-.marca{display:flex;align-items:center;gap:11px;margin-bottom:34px}
-.marca svg{flex:none;stroke:var(--vivo);fill:none;stroke-width:1.5;
+/* ---------- pórtico: la primera pantalla ----------
+   Azul de noche y letras doradas muy espaciadas. Las columnas están dibujadas
+   en SVG, no fotografiadas: pesan dos kilobytes, se ven nítidas en cualquier
+   pantalla y no dependen de una imagen ajena. */
+.hero{position:relative;overflow:hidden;background:#22304A;color:#E8EAF0;
+  min-height:min(78vh,660px);display:flex;align-items:center;
+  padding:64px 0 72px;border-bottom:1px solid #16202F}
+.hero .columnas{position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;opacity:.72;pointer-events:none}
+/* el velo: sin él las columnas compiten con el texto */
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 45%, rgba(34,48,74,.35) 0%,
+             rgba(30,42,66,.82) 55%, rgba(24,34,54,.97) 100%)}
+.hero .env{position:relative;z-index:2;text-align:center}
+.marca{display:inline-flex;align-items:center;gap:10px;margin-bottom:48px}
+.marca svg{flex:none;stroke:var(--oro);fill:none;stroke-width:1.5;
   stroke-linecap:round;stroke-linejoin:round}
-.marca b{font-family:var(--mono);font-size:11.5px;font-weight:500;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--vivo)}
-.hero h1{font-family:var(--serif);font-size:clamp(38px,7vw,62px);font-weight:700;
-  letter-spacing:-.025em;line-height:1.04;margin:0 0 16px;max-width:16ch}
-.hero p{margin:0;max-width:56ch;color:#CFC7B2;font-size:17px}
-.cifras{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:30px;
-  font-family:var(--mono);font-size:12px;color:#9A9184}
-.cifras b{color:#ECE4D0;font-weight:500}
+.marca b{font-family:var(--mono);font-size:10.5px;font-weight:400;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--oro)}
+.hero h1{font-weight:200;color:var(--oro);margin:0 0 22px;
+  font-size:clamp(26px,6.4vw,62px);line-height:1.3;
+  letter-spacing:.3em;text-indent:.3em;   /* el espaciado sobra a la derecha */
+  text-transform:uppercase}
+.hero h1 span{display:block}
+.hero h1 span+span{font-size:.62em;letter-spacing:.42em;text-indent:.42em;
+  margin-top:.5em;color:#D8BE84}
+.hero p{margin:0 auto;max-width:48ch;color:#BFC7D6;font-size:15px;
+  letter-spacing:.06em;text-transform:uppercase}
+.entrar{display:inline-block;margin-top:34px;padding:13px 34px;
+  border:1px solid var(--oro);border-radius:999px;color:var(--oro);
+  text-decoration:none;font-size:13.5px;letter-spacing:.12em;
+  text-transform:uppercase;transition:background .18s, color .18s}
+.entrar:hover{background:var(--oro);color:#1B2A40}
+.cifras{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 26px;
+  margin-top:46px;font-family:var(--mono);font-size:11.5px;color:#93A0B5}
+.cifras b{color:#D8BE84;font-weight:500}
 
 /* ---------- la lista de códigos ---------- */
 h2{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.12em;
@@ -106,18 +130,72 @@ footer{margin-top:44px;padding:26px 0 54px;border-top:1px solid var(--line);
 <a class="salto" href="#codigos">Saltar a la lista de códigos</a>
 
 <header class="hero">
+  <svg class="columnas" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice"
+       aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="piedra" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#8FA0BC" stop-opacity=".55"/>
+        <stop offset="42%" stop-color="#C6D2E6" stop-opacity=".75"/>
+        <stop offset="70%" stop-color="#6E7F9C" stop-opacity=".45"/>
+        <stop offset="100%" stop-color="#3E4C68" stop-opacity=".25"/>
+      </linearGradient>
+      <linearGradient id="desvanece" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#fff" stop-opacity=".95"/>
+        <stop offset="70%" stop-color="#fff" stop-opacity=".55"/>
+        <stop offset="100%" stop-color="#fff" stop-opacity=".12"/>
+      </linearGradient>
+      <mask id="corte"><rect width="1200" height="700" fill="url(#desvanece)"/></mask>
+    </defs>
+    <g mask="url(#corte)" transform="rotate(-11 600 350)">
+      <!-- el entablamento sobre las columnas -->
+      <rect x="-140" y="126" width="1500" height="30" fill="url(#piedra)" opacity=".8"/>
+      <rect x="-140" y="164" width="1500" height="13" fill="url(#piedra)" opacity=".5"/>
+      <!-- las columnas, con su capitel y su base -->
+      <g fill="url(#piedra)">
+        <rect x="-90" y="186" width="74" height="560" rx="6"/>
+        <rect x="80" y="186" width="74" height="560" rx="6"/>
+        <rect x="250" y="186" width="74" height="560" rx="6"/>
+        <rect x="420" y="186" width="74" height="560" rx="6"/>
+        <rect x="590" y="186" width="74" height="560" rx="6"/>
+        <rect x="760" y="186" width="74" height="560" rx="6"/>
+        <rect x="930" y="186" width="74" height="560" rx="6"/>
+        <rect x="1100" y="186" width="74" height="560" rx="6"/>
+      </g>
+      <g fill="url(#piedra)" opacity=".85">
+        <rect x="-100" y="178" width="94" height="14" rx="3"/>
+        <rect x="70" y="178" width="94" height="14" rx="3"/>
+        <rect x="240" y="178" width="94" height="14" rx="3"/>
+        <rect x="410" y="178" width="94" height="14" rx="3"/>
+        <rect x="580" y="178" width="94" height="14" rx="3"/>
+        <rect x="750" y="178" width="94" height="14" rx="3"/>
+        <rect x="920" y="178" width="94" height="14" rx="3"/>
+        <rect x="1090" y="178" width="94" height="14" rx="3"/>
+      </g>
+      <!-- las estrías: lo que hace que se lean como columnas y no como barras -->
+      <g stroke="#1E2A40" stroke-opacity=".28" stroke-width="2">
+        <path d="M-72 190v556M-54 190v556M-36 190v556"/>
+        <path d="M98 190v556M116 190v556M134 190v556"/>
+        <path d="M268 190v556M286 190v556M304 190v556"/>
+        <path d="M438 190v556M456 190v556M474 190v556"/>
+        <path d="M608 190v556M626 190v556M644 190v556"/>
+        <path d="M778 190v556M796 190v556M814 190v556"/>
+        <path d="M948 190v556M966 190v556M984 190v556"/>
+        <path d="M1118 190v556M1136 190v556M1154 190v556"/>
+      </g>
+    </g>
+  </svg>
+
   <div class="env">
     <div class="marca">
-      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M12 6.5C10.5 5 8.5 4.3 6 4.3H3v13.4h3c2.5 0 4.5.7 6 2.2 1.5-1.5 3.5-2.2 6-2.2h3V4.3h-3c-2.5 0-4.5.7-6 2.2Z"/>
         <path d="M12 6.5v13.4"/>
       </svg>
-      <b>Códigos de Chile</b>
+      <b>Sitio no oficial</b>
     </div>
-    <h1>El texto oficial, legible.</h1>
-    <p>Los códigos de la República, con buscador instantáneo, índice navegable y
-       lectura sin conexión. Cada uno se genera desde el XML oficial de Ley Chile
-       y se revisa todos los días.</p>
+    <h1><span>Códigos legales</span><span>de Chile</span></h1>
+    <p>El texto oficial de Ley Chile, legible</p>
+    <a class="entrar" href="#codigos">Ver los códigos</a>
     <div class="cifras">
       <span><b>{{N_CODIGOS}}</b> códigos</span>
       <span><b>{{N_ARTICULOS}}</b> artículos</span>
